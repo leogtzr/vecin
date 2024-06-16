@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  vecin_db:
+    container_name: vecin
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=${VECIN_DB_PASSWORD}
+      - POSTGRES_USER=${VECIN_DB_USER}
+      - POSTGRES_DB=${VECIN_DB}
+      - PGPASSWORD=${VECIN_DB_PASSWORD}
+    volumes:
+      - ./database-data:/var/lib/postgresql/data/
+      - ./database/sql:/docker-entrypoint-initdb.d/
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
+    container_name: app
+    ports:
+      - "8180:8180"
+    environment:
+      - VECIN_DB_PATH=/var/lib/appdata/vecin.db
+      - DB_MODE=${DB_MODE}
+      - RUN_MODE=${RUN_MODE}
+      - PORT=8180
+      - POSTGRES_PASSWORD=${VECIN_DB_PASSWORD}
+      - PGUSER=${VECIN_DB_USER}
+      - PGDATABASE=${VECIN_DB}
+      - PGHOST=${VECIN_DB_HOST}
+      - PGPORT=${PGPORT}
+    depends_on:
+      - vecin_db
+
+volumes:
+  database-data:

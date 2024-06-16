@@ -1,0 +1,20 @@
+{{define "content"}}
+<form id="searchForm">
+    <div class="input-group mb-3 search-input-group">
+        <input type="text" class="form-control" id="textSearch" placeholder="Buscar libro..." required>
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+        </div>
+    </div>
+
+    <p class="error-message" style="display: none;">Por favor, introduce una palabra antes de buscar.</p>
+
+    <div class="mb-3">
+        <input type="checkbox" id="byTitle" name="searchType" value="byTitle">
+        <label for="byTitle">Por título</label>
+
+        <input type="checkbox" id="byAuthor" name="searchType" value="byAuthor">
+        <label for="byAuthor">Por autor</label>
+    </div>
+</form>
+{{end}}
