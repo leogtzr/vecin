@@ -28,6 +28,12 @@ func createRoutes(dao *dao.DAO) *Routes {
 			Path:        "/",
 			HandlerFunc: handler.IndexPage,
 		},
+		Router{
+			Name:        "Landing Page",
+			Method:      "GET",
+			Path:        "/landing",
+			HandlerFunc: handler.LandingPage,
+		},
 	}
 
 	return routes

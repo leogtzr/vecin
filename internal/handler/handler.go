@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const numberOfResultsByPage = 20
+// const numberOfResultsByPage = 20
 
 type RequestData struct {
 	BookID string `json:"book_id"`
@@ -92,6 +92,35 @@ func IndexPage(w http.ResponseWriter, r *http.Request) {
 		"internal/template/base.html",
 		"internal/template/header.html",
 		"internal/template/content.html",
+		"internal/template/footer.html",
+		"internal/template/scripts.html",
+	)
+	if err != nil {
+		log.Printf("Error parsing templates: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.ExecuteTemplate(w, "base", pageVariables)
+	if err != nil {
+		log.Printf("Error executing template: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+}
+
+func LandingPage(w http.ResponseWriter, r *http.Request) {
+	now := time.Now()
+
+	pageVariables := PageVariables{
+		Year:    now.Format("2006"),
+		AppName: "Vecin",
+	}
+
+	tmpl, err := template.ParseFiles(
+		"internal/template/landing.html",
+		"internal/template/header.html",
+		"internal/template/landing_page.html",
 		"internal/template/footer.html",
 		"internal/template/scripts.html",
 	)
