@@ -1,20 +1,31 @@
 {{define "content"}}
-<form id="searchForm">
-    <div class="input-group mb-3 search-input-group">
-        <input type="text" class="form-control" id="textSearch" placeholder="Buscar libro..." required>
-        <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+<section class="mt-5 mb-5">
+    <div class="container search-container">    
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-center">Iniciar Sesión</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="username">Usuario</label>
+                        <input type="text" class="form-control" id="username" placeholder="Ingresa tu usuario" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" class="form-control" id="password" placeholder="Ingresa tu contraseña" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
+                </form>
+                <div class="ml-auto text-left">
+                    <a href="/recuperar">¿Olvidaste tu usuario o contraseña?</a>
+                </div>
+                <div class="mt-4 text-center">
+                    <a href="/registrar-fraccionamiento" class="large-text">Registra tu fraccionamiento</a>
+                </div>
+                <div class="mt-4 text-center">
+                    <a href="/que-es-vecin">¿Qué es Vecin?</a>
+                </div>
+            </div>
         </div>
     </div>
-
-    <p class="error-message" style="display: none;">Por favor, introduce una palabra antes de buscar.</p>
-
-    <div class="mb-3">
-        <input type="checkbox" id="byTitle" name="searchType" value="byTitle">
-        <label for="byTitle">Por título</label>
-
-        <input type="checkbox" id="byAuthor" name="searchType" value="byAuthor">
-        <label for="byAuthor">Por autor</label>
-    </div>
-</form>
+</section>
 {{end}}

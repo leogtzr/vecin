@@ -23,3 +23,12 @@ body {
     color: red;
     font-size: 0.9rem;
 }
+
+.home-footer {
+    background-color: #3780ca; /* Color verde */
+}
+
+.large-text {
+    font-size: 1.5em; /* Ajusta este valor según el tamaño deseado */
+    font-weight: bold; /* Opcional, para hacerlo más destacable */
+}

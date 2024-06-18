@@ -14,15 +14,8 @@
 
 <body>
     {{template "header" .}}
-
-    <section class="mt-5 mb-5">
-        <div class="container search-container">
-            {{template "content" .}}
-        </div>
-    </section>
-
+    {{template "content" .}}
     {{template "footer" .}}
-
     {{template "scripts" .}}
 </body>
 

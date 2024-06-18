@@ -6,7 +6,7 @@ build:
 	@go build -o vecin ./cmd/webapp
 
 clean:
-	go clean
+	rm -f "${BIN_FILE}"
 	rm -f "cp.out"
 	rm -f nohup.out
 	rm -f "${BIN_FILE}"
