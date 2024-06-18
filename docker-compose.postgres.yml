@@ -22,8 +22,8 @@ services:
       - "8180:8180"
     environment:
       - VECIN_DB_PATH=/var/lib/appdata/vecin.db
-      - DB_MODE=${DB_MODE}
-      - RUN_MODE=${RUN_MODE}
+      - DB_MODE=postgres
+      - RUN_MODE=prod
       - PORT=8180
       - POSTGRES_PASSWORD=${VECIN_DB_PASSWORD}
       - PGUSER=${VECIN_DB_USER}

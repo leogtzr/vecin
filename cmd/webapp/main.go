@@ -29,7 +29,8 @@ func init() {
 		runMode = "dev"
 	}
 	if dbHost == "" {
-		dbHost = os.Getenv("LEONLIB_DB_HOST")
+		// TODO: fix this
+		dbHost = os.Getenv("xxx")
 		if dbHost == "" {
 			dbHost = "localhost"
 		}

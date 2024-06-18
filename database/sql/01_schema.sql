@@ -1,37 +1,84 @@
-CREATE TABLE vecino (
-   id SERIAL PRIMARY KEY,
-   title VARCHAR(255) NOT NULL
-   -- author VARCHAR(255) NOT NULL,
-   -- description TEXT,
-   -- read BOOLEAN DEFAULT FALSE,
-   -- added_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-   -- goodreads_link VARCHAR(255)
+CREATE TABLE comunidad (
+    comunidad_id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    direccion VARCHAR(255),
+    tipo VARCHAR(50) NOT NULL CHECK (tipo IN ('Fraccionamiento', 'Edificio', 'Calle'))
 );
 
--- CREATE TABLE book_images (
---      image_id SERIAL PRIMARY KEY,
---      book_id INTEGER NOT NULL REFERENCES books(id),
---      image BYTEA NOT NULL,
---      added_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
--- );
+CREATE TABLE casa (
+    casa_id SERIAL PRIMARY KEY,
+    comunidad_id INT REFERENCES comunidad(comunidad_id),
+    direccion VARCHAR(255) NOT NULL,
+    numero INT NOT NULL
+);
 
--- CREATE TABLE users (
---    user_id TEXT PRIMARY KEY,
---    email TEXT NOT NULL UNIQUE,
---    name TEXT,
---    oauth_identifier VARCHAR NOT NULL
--- );
+CREATE TABLE departamento (
+    departamento_id SERIAL PRIMARY KEY,
+    comunidad_id INT REFERENCES comunidad(comunidad_id),
+    direccion VARCHAR(255) NOT NULL,
+    numero INT NOT NULL
+);
 
--- CREATE TABLE book_likes (
---     like_id SERIAL PRIMARY KEY,
---     book_id INTEGER REFERENCES books(id),
---     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
---     user_id TEXT REFERENCES users(user_id)
--- );
+CREATE TABLE habitante (
+    habitante_id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    casa_id INT REFERENCES casa(casa_id) NULL,
+    departamento_id INT REFERENCES departamento(departamento_id) NULL,
+    telefono VARCHAR(15),
+    email VARCHAR(100)
+);
 
-CREATE INDEX idx_vecino_title ON vecino USING btree (title);
--- CREATE INDEX idx_books_author ON books USING btree (author);
--- CREATE INDEX idx_books_added_on ON books USING btree (added_on);
--- CREATE INDEX idx_book_images_book_id ON book_images USING btree (book_id);
+CREATE TABLE comite (
+    comite_id SERIAL PRIMARY KEY,
+    comunidad_id INT REFERENCES comunidad(comunidad_id),
+    nombre VARCHAR(100) NOT NULL
+);
 
--- ALTER TABLE book_likes ADD CONSTRAINT unique_book_like_per_user UNIQUE(book_id, user_id);
+CREATE TABLE comite_miembro (
+    comite_miembro_id SERIAL PRIMARY KEY,
+    comite_id INT REFERENCES comite(comite_id),
+    habitante_id INT REFERENCES habitante(habitante_id)
+);
+
+CREATE TABLE junta (
+    junta_id SERIAL PRIMARY KEY,
+    comunidad_id INT REFERENCES comunidad(comunidad_id),
+    fecha DATE NOT NULL,
+    descripcion TEXT
+);
+
+CREATE TABLE anuncio (
+    anuncio_id SERIAL PRIMARY KEY,
+    comunidad_id INT REFERENCES comunidad(comunidad_id),
+    fecha DATE NOT NULL,
+    descripcion TEXT
+);
+
+CREATE TABLE cuota (
+    cuota_id SERIAL PRIMARY KEY,
+    casa_id INT REFERENCES casa(casa_id) NULL,
+    departamento_id INT REFERENCES departamento(departamento_id) NULL,
+    monto DECIMAL(10, 2) NOT NULL,
+    fecha_pago DATE NOT NULL,
+    descripcion TEXT
+);
+
+CREATE TABLE bazar (
+    bazar_id SERIAL PRIMARY KEY,
+    casa_id INT REFERENCES casa(casa_id) NULL,
+    departamento_id INT REFERENCES departamento(departamento_id) NULL,
+    fecha DATE NOT NULL,
+    descripcion TEXT,
+    precio DECIMAL(10, 2) NOT NULL,
+    vendido BOOLEAN DEFAULT FALSE,
+    acepta_regateo BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE anuncio_casa (
+    anuncio_casa_id SERIAL PRIMARY KEY,
+    casa_id INT REFERENCES casa(casa_id) NULL,
+    departamento_id INT REFERENCES departamento(departamento_id) NULL,
+    fecha DATE NOT NULL,
+    descripcion TEXT
+);
