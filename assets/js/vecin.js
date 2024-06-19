@@ -9,4 +9,21 @@ $(document).ready(function() {
     //     var targetModal = $(this).data('target');
     //     $(targetModal).modal('hide');
     // });
+
+    $('#tipoComunidad').on('change', function() {
+        var tipoComunidad = $('#tipoComunidad').val();
+        $('#tipoComunidadSpan').text(tipoComunidad.toLowerCase());
+    }).trigger('change');
+
+    $('#habitante').on('change', function() {
+        if ($(this).val() === 'Si') {
+            console.log('YES Opening this...');
+            $('#usuarioContraseña').slideDown();
+            $('#nombreUsuario, #contrasena').attr('required', true);
+        } else {
+            console.log('NO ...');
+            $('#usuarioContraseña').slideUp();
+            $('#nombreUsuario, #contrasena').removeAttr('required');
+        }
+    });
 });

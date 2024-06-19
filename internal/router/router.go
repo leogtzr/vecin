@@ -34,6 +34,20 @@ func createRoutes(dao *dao.DAO) *Routes {
 			Path:        "/landing",
 			HandlerFunc: handler.LandingPage,
 		},
+		Router{
+			Name:        "Registrar Fraccionamiento",
+			Method:      "GET",
+			Path:        "/registrar-fraccionamiento",
+			HandlerFunc: handler.RegisterFracc,
+		},
+		Router{
+			Name:   "Login",
+			Method: "POST",
+			Path:   "/login",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.Login(dao, w, r)
+			},
+		},
 	}
 
 	return routes

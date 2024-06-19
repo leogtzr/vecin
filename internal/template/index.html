@@ -6,7 +6,15 @@
 
 <body>
     {{template "nav" .}}
-    {{template "content" .}}
+
+    {{if not .LoggedIn}}
+        {{template "login" .}}
+    {{else}}
+        <h2>
+            User is already logged in
+        </h2>
+    {{end}}
+
     {{template "footer" .}}
     {{template "scripts" .}}
 </body>

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"crypto/rand"
+	"database/sql"
 	"encoding/base64"
 	"html/template"
 	"log"
@@ -9,6 +10,10 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+	"vecin/internal/dao"
+	"vecin/internal/middleware"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // const numberOfResultsByPage = 20
@@ -91,16 +96,23 @@ func addTemplateFiles(additionalFiles ...string) []string {
 	return append(templateHTMLFiles, additionalFiles...)
 }
 
+func isLoggedIn(r *http.Request) bool {
+	// ToDo: finish this...
+	return false
+}
+
+// path: "/""
 func IndexPage(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 
 	pageVariables := PageVariables{
-		Year:    now.Format("2006"),
-		AppName: "Vecin",
+		Year:     now.Format("2006"),
+		AppName:  "Vecin",
+		LoggedIn: isLoggedIn(r),
 	}
 
 	tmpl, err := template.ParseFiles(
-		addTemplateFiles("internal/template/index.html", "internal/template/content.html")...,
+		addTemplateFiles("internal/template/index.html", "internal/template/login.html")...,
 	)
 	if err != nil {
 		log.Printf("Error parsing templates: %v", err)
@@ -116,6 +128,7 @@ func IndexPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// path: "/landing"
 func LandingPage(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 
@@ -142,6 +155,60 @@ func LandingPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterFracc(w http.ResponseWriter, r *http.Request) {
+	now := time.Now()
+
+	pageVariables := PageVariables{
+		Year:    now.Format("2006"),
+		AppName: "Vecin",
+	}
+
+	tmpl, err := template.ParseFiles(
+		addTemplateFiles("internal/template/registrar_fraccionamiento.html")...,
+	)
+	if err != nil {
+		log.Printf("Error parsing templates: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.ExecuteTemplate(w, "base", pageVariables)
+	if err != nil {
+		log.Printf("Error executing template: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+}
+
+func Login(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+
+	user, err := (*dao).GetUserByUsername(username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "Usuario o contraseña incorrectos", http.StatusUnauthorized)
+			return
+		}
+		http.Error(w, "Error interno del servidor", http.StatusInternalServerError)
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.HashContrasena), []byte(password)); err != nil {
+		http.Error(w, "Usuario o contraseña incorrectos", http.StatusUnauthorized)
+		return
+	}
+
+	store := middleware.GetSessionStore()
+	session, _ := store.Get(r, "session")
+	session.Values["user_id"] = user.ID
+	session.Save(r, w)
+
+	http.Redirect(w, r, "/landing", http.StatusSeeOther)
 }
 
 // func getDatabaseEmailFromSessionID(db *sql.DB, userID string) (string, error) {

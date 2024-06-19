@@ -24,3 +24,5 @@ go.work.sum
 tmp/
 database-data/
 vecin
+
+.env

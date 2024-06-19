@@ -1,5 +1,10 @@
 package dao
 
+import (
+	"database/sql"
+	"vecin/internal/model"
+)
+
 // func (dao *postgresBookDAO) AddAll(books []book.BookInfo) error {
 // 	for _, book := range books {
 // 		log.Printf("Reading: (%s)", book)
@@ -49,8 +54,25 @@ package dao
 // 	return addUser(dao.db, userID, email, name, oauthIdentifier)
 // }
 
-func (dao *postgresBookDAO) Close() error {
+func (dao *daoImpl) Close() error {
 	return nil
+}
+
+func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
+	query := `SELECT usuario_id, nombre_usuario, nombre_completo, email, hash_contrasena, fecha_creacion 
+              FROM usuario WHERE nombre_usuario = $1`
+	row := dao.db.QueryRow(query, username)
+
+	var user model.Usuario
+	err := row.Scan(&user.ID, &user.NombreUsuario, &user.NombreCompleto, &user.Email, &user.HashContrasena, &user.FechaCreacion)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, err // Usuario no encontrado
+		}
+		return nil, err // Otro error
+	}
+
+	return &user, nil
 }
 
 // func (dao *postgresBookDAO) CreateBook(book book.BookInfo) error {
@@ -268,7 +290,7 @@ func (dao *postgresBookDAO) Close() error {
 // 	return count, nil
 // }
 
-func (dao *postgresBookDAO) Ping() error {
+func (dao *daoImpl) Ping() error {
 	return dao.db.Ping()
 }
 

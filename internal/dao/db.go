@@ -3,15 +3,17 @@ package dao
 import (
 	"database/sql"
 	"fmt"
+	"vecin/internal/model"
 )
 
 // DAO
 type DAO interface {
 	Close() error
 	Ping() error
+	GetUserByUsername(username string) (*model.Usuario, error)
 }
 
-type postgresBookDAO struct {
+type daoImpl struct {
 	db *sql.DB
 }
 
@@ -29,7 +31,7 @@ func NewDAO(dbMode, dbHost, dbPort, dbUser, dbPassword, dbName string) (DAO, err
 		if err != nil {
 			return nil, err
 		}
-		bookDAO = &postgresBookDAO{
+		bookDAO = &daoImpl{
 			db: DB,
 		}
 
