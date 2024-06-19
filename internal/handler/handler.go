@@ -13,6 +13,13 @@ import (
 
 // const numberOfResultsByPage = 20
 
+var templateHTMLFiles = []string{
+	"internal/template/head.html",
+	"internal/template/nav.html",
+	"internal/template/footer.html",
+	"internal/template/scripts.html",
+}
+
 type RequestData struct {
 	BookID string `json:"book_id"`
 }
@@ -80,6 +87,10 @@ func getTemplatePath(templateFileName string) string {
 	return templatePath
 }
 
+func addTemplateFiles(additionalFiles ...string) []string {
+	return append(templateHTMLFiles, additionalFiles...)
+}
+
 func IndexPage(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 
@@ -89,11 +100,7 @@ func IndexPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl, err := template.ParseFiles(
-		"internal/template/base.html",
-		"internal/template/header.html",
-		"internal/template/content.html",
-		"internal/template/footer.html",
-		"internal/template/scripts.html",
+		addTemplateFiles("internal/template/index.html", "internal/template/content.html")...,
 	)
 	if err != nil {
 		log.Printf("Error parsing templates: %v", err)
@@ -118,11 +125,7 @@ func LandingPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl, err := template.ParseFiles(
-		"internal/template/landing.html",
-		"internal/template/header.html",
-		"internal/template/landing_page.html",
-		"internal/template/footer.html",
-		"internal/template/scripts.html",
+		addTemplateFiles("internal/template/landing.html", "internal/template/landing_page.html")...,
 	)
 	if err != nil {
 		log.Printf("Error parsing templates: %v", err)
@@ -136,6 +139,9 @@ func LandingPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+}
+
+func RegisterFracc(w http.ResponseWriter, r *http.Request) {
 }
 
 // func getDatabaseEmailFromSessionID(db *sql.DB, userID string) (string, error) {

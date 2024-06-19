@@ -1,8 +1,23 @@
 CREATE TABLE comunidad (
     comunidad_id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    direccion VARCHAR(255),
-    tipo VARCHAR(50) NOT NULL CHECK (tipo IN ('Fraccionamiento', 'Edificio', 'Calle'))
+    direccion_calle VARCHAR(100),
+    direccion_numero VARCHAR(20),
+    direccion_colonia VARCHAR(100),
+    direccion_cp VARCHAR(10),
+    direccion_ciudad VARCHAR(100),
+    direccion_estado VARCHAR(100),
+    direccion_pais VARCHAR(100),
+    tipo VARCHAR(50) NOT NULL CHECK (tipo IN ('Fraccionamiento', 'Edificio', 'Calle')),
+    modelo_suscripcion VARCHAR(20) NOT NULL CHECK (modelo_suscripcion IN ('Mensual', 'Bimestral', 'Anual'))
+);
+
+CREATE TABLE registro (
+    registro_id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    telefono VARCHAR(15),
+    correo VARCHAR(100),
+    comunidad_id INT REFERENCES comunidad(comunidad_id)
 );
 
 CREATE TABLE casa (
@@ -82,3 +97,30 @@ CREATE TABLE anuncio_casa (
     fecha DATE NOT NULL,
     descripcion TEXT
 );
+
+
+
+
+-- Insertar un nuevo fraccionamiento
+INSERT INTO comunidad (nombre, direccion_calle, direccion_numero, direccion_colonia, direccion_cp, direccion_ciudad, direccion_estado, direccion_pais, tipo, modelo_suscripcion)
+VALUES ('Calzada del Bosque', 'Av. Siempre Viva', '123', 'Los Pinos', '12345', 'Ciudad de México', 'CDMX', 'México', 'Fraccionamiento', 'Anual');
+
+-- Obtener el ID del fraccionamiento recién insertado
+SELECT currval(pg_get_serial_sequence('comunidad','comunidad_id'));
+
+-- Suponiendo que el ID del fraccionamiento es 1
+-- Insertar información de quien registra el fraccionamiento
+INSERT INTO registro (nombre, telefono, correo, comunidad_id)
+VALUES ('Edgar Gutiérrez', '555-1234', 'edgar@example.com', 1);
+
+-- Insertar casas y habitantes
+INSERT INTO casa (comunidad_id, direccion, numero) VALUES (1, 'Av. Siempre Viva 123', 1);
+INSERT INTO habitante (nombre, apellido, casa_id, telefono, email) VALUES ('Edgar', 'Gutiérrez', 1, '555-1234', 'edgar@example.com');
+INSERT INTO habitante (nombre, apellido, casa_id, telefono, email) VALUES ('Maria', 'Lopez', 1, '555-5678', 'maria@example.com');
+
+-- Insertar comité y miembros del comité
+INSERT INTO comite (comunidad_id, nombre) VALUES (1, 'Comité de Seguridad');
+-- Obtener el ID del comité recién insertado
+SELECT currval(pg_get_serial_sequence('comite','comite_id'));
+-- Suponiendo que el ID del comité es 1
+INSERT INTO comite_miembro (comite_id, habitante_id) VALUES (1, 1); -- Edgar Gutiérrez es parte del comité
