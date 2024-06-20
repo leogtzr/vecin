@@ -19,12 +19,12 @@ $(document).ready(function() {
     }).trigger('change');
 
     $('#habitante').on('change', function() {
-        if ($(this).val() === 'Si') {
+        if ($(this).val() === 'yes') {
             console.log('YES Opening this...');
             $('#registranteSignUp').slideDown();
             $('#registranteSignUpUserName, #registranteSignUpPassword').attr('required', true);
         } else {
-            console.log('NO ...');
+            //console.log('NO ...');
             $('#registranteSignUp').slideUp();
             $('#registranteSignUpUserName, #registranteSignUpPassword').removeAttr('required');
         }
