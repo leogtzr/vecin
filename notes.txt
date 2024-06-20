@@ -1,0 +1,5 @@
+# Obtener info de los estados en México:
+http "http://api.geonames.org/childrenJSON?geonameId=3996063&username=leogtzr"
+
+# Obtener información de los municipios:
+http://api.geonames.org/childrenJSON?geonameId=4014336&username=leogtzr
