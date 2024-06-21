@@ -1,21 +1,21 @@
-package dao
+package database
 
 import (
 	"database/sql"
 	"vecin/internal/model"
 )
 
-// func (dao *postgresBookDAO) AddAll(books []book.BookInfo) error {
+// func (database *postgresBookDAO) AddAll(books []book.BookInfo) error {
 // 	for _, book := range books {
 // 		log.Printf("Reading: (%s)", book)
-// 		bookInfo, err := dao.GetBookByID(book.ID)
+// 		bookInfo, err := database.GetBookByID(book.ID)
 // 		if err == nil && bookInfo.ID == book.ID {
 // 			log.Printf("Book with ID: %d already exists, skipping", book.ID)
 // 			continue
 // 		}
 
 // 		var bookID int
-// 		stmt, err := dao.db.Prepare("INSERT INTO books(id, title, author, description, read, added_on, goodreads_link) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id")
+// 		stmt, err := database.db.Prepare("INSERT INTO books(id, title, author, description, read, added_on, goodreads_link) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id")
 // 		if err != nil {
 // 			return err
 // 		}
@@ -31,7 +31,7 @@ import (
 // 				return err
 // 			}
 
-// 			imgStmt, err := dao.db.Prepare("INSERT INTO book_images(book_id, image) VALUES($1, $2)")
+// 			imgStmt, err := database.db.Prepare("INSERT INTO book_images(book_id, image) VALUES($1, $2)")
 // 			if err != nil {
 // 				return err
 // 			}
@@ -46,12 +46,12 @@ import (
 // 	return nil
 // }
 
-// func (dao *postgresBookDAO) AddImageToBook(bookID int, imageData []byte) error {
-// 	return addImageToBook(bookID, imageData, dao.db)
+// func (database *postgresBookDAO) AddImageToBook(bookID int, imageData []byte) error {
+// 	return addImageToBook(bookID, imageData, database.db)
 // }
 
-// func (dao *postgresBookDAO) AddUser(userID, email, name, oauthIdentifier string) error {
-// 	return addUser(dao.db, userID, email, name, oauthIdentifier)
+// func (database *postgresBookDAO) AddUser(userID, email, name, oauthIdentifier string) error {
+// 	return addUser(database.db, userID, email, name, oauthIdentifier)
 // }
 
 func (dao *daoImpl) Close() error {
@@ -75,8 +75,8 @@ func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
 	return &user, nil
 }
 
-// func (dao *postgresBookDAO) CreateBook(book book.BookInfo) error {
-// 	stmt, err := dao.db.Prepare("INSERT INTO books (title, author, description, read, goodreads_link) VALUES ($1, $2, $3, $4, $5)")
+// func (database *postgresBookDAO) CreateBook(book book.BookInfo) error {
+// 	stmt, err := database.db.Prepare("INSERT INTO books (title, author, description, read, goodreads_link) VALUES ($1, $2, $3, $4, $5)")
 // 	if err != nil {
 // 		return err
 // 	}
@@ -92,7 +92,7 @@ func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
 // 		return err
 // 	}
 
-// 	imgStmt, err := dao.db.Prepare("INSERT INTO book_images(book_id, image) VALUES($1, $2)")
+// 	imgStmt, err := database.db.Prepare("INSERT INTO book_images(book_id, image) VALUES($1, $2)")
 // 	if err != nil {
 // 		return err
 // 	}
@@ -105,15 +105,15 @@ func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
 // 	return nil
 // }
 
-// func (dao *postgresBookDAO) GetAllAuthors() ([]string, error) {
-// 	return getAllAuthors(dao.db)
+// func (database *postgresBookDAO) GetAllAuthors() ([]string, error) {
+// 	return getAllAuthors(database.db)
 // }
 
-// func (dao *postgresBookDAO) GetBookByID(id int) (book.BookInfo, error) {
+// func (database *postgresBookDAO) GetBookByID(id int) (book.BookInfo, error) {
 // 	var err error
 // 	var queryStr = `SELECT b.id, b.title, b.author, b.description, b.read, b.added_on, b.goodreads_link FROM books b WHERE b.id=$1`
 
-// 	bookRows, err := dao.db.Query(queryStr, id)
+// 	bookRows, err := database.db.Query(queryStr, id)
 // 	if err != nil {
 // 		return book.BookInfo{}, err
 // 	}
@@ -148,7 +148,7 @@ func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
 // 		}
 // 	}
 
-// 	bookImages, err := dao.GetImagesByBookID(id)
+// 	bookImages, err := database.GetImagesByBookID(id)
 // 	if err != nil {
 // 		return book.BookInfo{}, err
 // 	}
@@ -158,15 +158,15 @@ func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
 // 	return bookInfo, nil
 // }
 
-// func (dao *postgresBookDAO) GetBookCount() (int, error) {
-// 	return getBookCount(dao.db)
+// func (database *postgresBookDAO) GetBookCount() (int, error) {
+// 	return getBookCount(database.db)
 // }
 
-// func (dao *postgresBookDAO) GetBooksWithPagination(offset, limit int) ([]book.BookInfo, error) {
-// 	return getBooksWithPagination(offset, limit, dao.db)
+// func (database *postgresBookDAO) GetBooksWithPagination(offset, limit int) ([]book.BookInfo, error) {
+// 	return getBooksWithPagination(offset, limit, database.db)
 // }
 
-// func (dao *postgresBookDAO) GetBooksBySearchTypeCoincidence(titleSearchText string, bookSearchType book.BookSearchType) ([]book.BookInfo, error) {
+// func (database *postgresBookDAO) GetBooksBySearchTypeCoincidence(titleSearchText string, bookSearchType book.BookSearchType) ([]book.BookInfo, error) {
 // 	var err error
 // 	queryStr := `SELECT b.id, b.title, b.author, b.description, b.read, b.added_on, b.goodreads_link FROM books b WHERE LOWER(b.title) LIKE '%' || LOWER($1) || '%' ORDER BY b.title`
 
@@ -174,7 +174,7 @@ func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
 // 		queryStr = `SELECT b.id, b.title, b.author, b.description, b.read, b.added_on, b.goodreads_link FROM books b WHERE LOWER(b.author) LIKE '%' || LOWER($1) || '%' ORDER BY b.title`
 // 	}
 
-// 	booksByTitleRows, err := dao.db.Query(queryStr, "%"+titleSearchText+"%")
+// 	booksByTitleRows, err := database.db.Query(queryStr, "%"+titleSearchText+"%")
 // 	if err != nil {
 // 		return []book.BookInfo{}, err
 // 	}
@@ -198,7 +198,7 @@ func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
 // 		bookInfo.ID = id
 // 		bookInfo.Title = title
 // 		bookInfo.Author = author
-// 		bookImages, err := dao.GetImagesByBookID(id)
+// 		bookImages, err := database.GetImagesByBookID(id)
 // 		if err != nil {
 // 			return []book.BookInfo{}, err
 // 		}
@@ -213,15 +213,15 @@ func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
 // 	return books, nil
 // }
 
-// func (dao *postgresBookDAO) GetImagesByBookID(bookID int) ([]book.BookImageInfo, error) {
-// 	return getImagesByBookID(bookID, dao.db)
+// func (database *postgresBookDAO) GetImagesByBookID(bookID int) ([]book.BookImageInfo, error) {
+// 	return getImagesByBookID(bookID, database.db)
 // }
 
-// func (dao *postgresBookDAO) GetUserInfoByID(id string) (user.UserInfo, error) {
+// func (database *postgresBookDAO) GetUserInfoByID(id string) (user.UserInfo, error) {
 // 	var err error
 // 	var queryStr = `SELECT u.user_id, u.email, u.name FROM users u WHERE u.user_id=$1`
 
-// 	userRow, err := dao.db.Query(queryStr, id)
+// 	userRow, err := database.db.Query(queryStr, id)
 // 	if err != nil {
 // 		return user.UserInfo{}, err
 // 	}
@@ -247,10 +247,10 @@ func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
 // 	return userInfo, nil
 // }
 
-// func (dao *postgresBookDAO) LikedBy(bookID, userID string) (bool, error) {
+// func (database *postgresBookDAO) LikedBy(bookID, userID string) (bool, error) {
 // 	queryStr := "SELECT EXISTS(SELECT 1 FROM book_likes WHERE book_id=$1 AND user_id=$2)"
 
-// 	rows, err := dao.db.Query(queryStr, bookID, userID)
+// 	rows, err := database.db.Query(queryStr, bookID, userID)
 // 	if err != nil {
 // 		return false, err
 // 	}
@@ -271,8 +271,8 @@ func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
 // 	return exists, nil
 // }
 
-// func (dao *postgresBookDAO) LikeBook(bookID, userID string) error {
-// 	_, err := dao.db.Exec("INSERT INTO book_likes(book_id, user_id) VALUES($1, $2) ON CONFLICT(book_id, user_id) DO NOTHING", bookID, userID)
+// func (database *postgresBookDAO) LikeBook(bookID, userID string) error {
+// 	_, err := database.db.Exec("INSERT INTO book_likes(book_id, user_id) VALUES($1, $2) ON CONFLICT(book_id, user_id) DO NOTHING", bookID, userID)
 
 // 	if err != nil {
 // 		return err
@@ -281,9 +281,9 @@ func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
 // 	return nil
 // }
 
-// func (dao *postgresBookDAO) LikesCount(bookID int) (int, error) {
+// func (database *postgresBookDAO) LikesCount(bookID int) (int, error) {
 // 	var count int
-// 	if err := dao.db.QueryRow("SELECT COUNT(*) FROM book_likes WHERE book_id = $1", bookID).Scan(&count); err != nil {
+// 	if err := database.db.QueryRow("SELECT COUNT(*) FROM book_likes WHERE book_id = $1", bookID).Scan(&count); err != nil {
 // 		return -1, err
 // 	}
 
@@ -294,26 +294,26 @@ func (dao *daoImpl) Ping() error {
 	return dao.db.Ping()
 }
 
-// func (dao *postgresBookDAO) RemoveImage(imageID int) error {
-// 	if _, err := dao.db.Exec("DELETE FROM book_images WHERE image_id=$1", imageID); err != nil {
+// func (database *postgresBookDAO) RemoveImage(imageID int) error {
+// 	if _, err := database.db.Exec("DELETE FROM book_images WHERE image_id=$1", imageID); err != nil {
 // 		return err
 // 	}
 
 // 	return nil
 // }
 
-// func (dao *postgresBookDAO) UnlikeBook(bookID, userID string) error {
-// 	if _, err := dao.db.Exec("DELETE FROM book_likes WHERE book_id=$1 AND user_id=$2", bookID, userID); err != nil {
+// func (database *postgresBookDAO) UnlikeBook(bookID, userID string) error {
+// 	if _, err := database.db.Exec("DELETE FROM book_likes WHERE book_id=$1 AND user_id=$2", bookID, userID); err != nil {
 // 		return err
 // 	}
 
 // 	return nil
 // }
 
-// func (dao *postgresBookDAO) UpdateBook(title string, author string, description string, read bool, goodreadsLink string, id int) error {
-// 	return updateBook(title, author, description, read, goodreadsLink, id, dao.db)
+// func (database *postgresBookDAO) UpdateBook(title string, author string, description string, read bool, goodreadsLink string, id int) error {
+// 	return updateBook(title, author, description, read, goodreadsLink, id, database.db)
 // }
 
-// func (dao *postgresBookDAO) GetWishListBooks() ([]book.WishListBook, error) {
-// 	return dao.wishListBooks, nil
+// func (database *postgresBookDAO) GetWishListBooks() ([]book.WishListBook, error) {
+// 	return database.wishListBooks, nil
 // }

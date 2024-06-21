@@ -4,54 +4,18 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"vecin/internal/dao"
+	"vecin/internal/config"
+	"vecin/internal/database"
 	"vecin/internal/router"
 
 	_ "github.com/lib/pq"
 	"golang.org/x/time/rate"
 )
 
-var (
-	dbMode     = os.Getenv("DB_MODE")
-	dbHost     = os.Getenv("PGHOST")
-	dbUser     = os.Getenv("PGUSER")
-	dbPassword = os.Getenv("POSTGRES_PASSWORD")
-	dbName     = os.Getenv("PGDATABASE")
-	dbPort     = os.Getenv("PGPORT")
-	runMode    = os.Getenv("RUN_MODE")
-)
-
-func init() {
-	if dbMode == "" {
-		dbMode = "postgres"
-	}
-	if runMode == "" {
-		runMode = "dev"
-	}
-	if dbHost == "" {
-		// TODO: fix this
-		dbHost = os.Getenv("xxx")
-		if dbHost == "" {
-			dbHost = "localhost"
-		}
-	}
-	if dbPort == "" {
-		dbPort = "5432"
-	}
-	if dbUser == "" {
-		dbUser = os.Getenv("VECIN_DB_USER")
-	}
-	if dbPassword == "" {
-		dbPassword = os.Getenv("VECIN_DB_PASSWORD")
-	}
-	if dbName == "" {
-		dbName = os.Getenv("VECIN_DB")
-	}
-}
-
 func main() {
-	log.Printf("DB mode: (%s)", dbMode)
-	dao, err := dao.NewDAO(dbMode, dbHost, dbPort, dbUser, dbPassword, dbName)
+	cfg := config.NewConfig()
+
+	dao, err := database.NewDAO(cfg.DBMode, cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBPassword, cfg.DBName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -65,7 +29,7 @@ func main() {
 	}
 
 	limiter := rate.NewLimiter(rate.Limit(1), 5)
-	r := router.NewRouter(&dao, limiter)
+	r := router.NewRouter(&dao, limiter, cfg)
 
 	fs := http.FileServer(http.Dir("assets/"))
 	r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", fs))
@@ -75,6 +39,6 @@ func main() {
 		port = "8180"
 	}
 
-	log.Printf("Listening on port %s\n", port)
-	log.Fatal(http.ListenAndServe(":"+port, r))
+	log.Printf("Listening on port %s\n", cfg.HTTPPort)
+	log.Fatal(http.ListenAndServe(":"+cfg.HTTPPort, r))
 }

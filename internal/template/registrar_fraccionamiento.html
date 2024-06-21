@@ -67,12 +67,16 @@
     
                         <div class="form-group">
                             <label for="direccionCiudad">Ciudad</label>
-                            <input type="text" class="form-control" id="direccionCiudad" name="direccionCiudad" placeholder="Ingresa la ciudad" required>
+                            <select class="form-control" id="direccionCiudad" name="direccionCiudad" required>
+                                <option value="">Selecciona una ciudad</option>
+                            </select>
                         </div>
     
                         <div class="form-group">
                             <label for="direccionEstado">Estado</label>
-                            <input type="text" class="form-control" id="direccionEstado" name="direccionEstado" placeholder="Ingresa el estado" required>
+                            <select class="form-control" id="direccionEstado" name="direccionEstado" required>
+                                <option value="">Selecciona un estado</option>
+                            </select>
                         </div>
     
                         <div class="form-group">
@@ -146,7 +150,7 @@
     {{template "footer" .}}
     {{template "scripts" .}}
 
-    
+    <script src="/assets/js/registro_fracc.js"></script>
 </body>
 
 </html>

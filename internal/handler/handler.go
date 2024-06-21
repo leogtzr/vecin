@@ -4,19 +4,21 @@ import (
 	"crypto/rand"
 	"database/sql"
 	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"time"
-	"vecin/internal/dao"
+	"vecin/internal/config"
+	"vecin/internal/database"
 	"vecin/internal/middleware"
-
-	"golang.org/x/crypto/bcrypt"
+	model "vecin/internal/model/geonames"
 )
-
-// const numberOfResultsByPage = 20
 
 var templateHTMLFiles = []string{
 	"internal/template/head.html",
@@ -96,17 +98,16 @@ func addTemplateFiles(additionalFiles ...string) []string {
 	return append(templateHTMLFiles, additionalFiles...)
 }
 
+// ToDo: finish this...
 func isLoggedIn(r *http.Request) bool {
-	// ToDo: finish this...
 	return false
 }
 
+// IndexPage renders the home or index page.
 // path: "/""
 func IndexPage(w http.ResponseWriter, r *http.Request) {
-	now := time.Now()
-
 	pageVariables := PageVariables{
-		Year:     now.Format("2006"),
+		Year:     time.Now().Format("2006"),
 		AppName:  "Vecin",
 		LoggedIn: isLoggedIn(r),
 	}
@@ -154,32 +155,7 @@ func LandingPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func RegisterFracc(w http.ResponseWriter, r *http.Request) {
-	now := time.Now()
-
-	pageVariables := PageVariables{
-		Year:    now.Format("2006"),
-		AppName: "Vecin",
-	}
-
-	tmpl, err := template.ParseFiles(
-		addTemplateFiles("internal/template/registrar_fraccionamiento.html")...,
-	)
-	if err != nil {
-		log.Printf("Error parsing templates: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	err = tmpl.ExecuteTemplate(w, "base", pageVariables)
-	if err != nil {
-		log.Printf("Error executing template: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-}
-
-func Login(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+func Login(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
@@ -206,9 +182,34 @@ func Login(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
 	store := middleware.GetSessionStore()
 	session, _ := store.Get(r, "session")
 	session.Values["user_id"] = user.ID
-	session.Save(r, w)
+	_ = session.Save(r, w)
 
 	http.Redirect(w, r, "/landing", http.StatusSeeOther)
+}
+
+// RegisterFracc handles the rendering to register a fraccionamiento.
+// path: "/registrar-fraccionamiento"
+func RegisterFracc(w http.ResponseWriter, r *http.Request) {
+	pageVariables := PageVariables{
+		Year:    time.Now().Format("2006"),
+		AppName: "Vecin",
+	}
+
+	tmpl, err := template.ParseFiles(
+		addTemplateFiles("internal/template/registrar_fraccionamiento.html")...,
+	)
+	if err != nil {
+		log.Printf("Error parsing templates: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.ExecuteTemplate(w, "base", pageVariables)
+	if err != nil {
+		log.Printf("Error executing template: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 }
 
 // func getDatabaseEmailFromSessionID(db *sql.DB, userID string) (string, error) {
@@ -311,10 +312,8 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 		ErrorMessage string
 	}
 
-	now := time.Now()
-
 	pageVariables := ErrorVariables{
-		Year:         now.Format("2006"),
+		Year:         time.Now().Format("2006"),
 		ErrorMessage: errorMessage,
 	}
 
@@ -434,7 +433,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	return result
 // }
 
-// func BooksByAuthorPage(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func BooksByAuthorPage(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	now := time.Now()
 // 	pageVariables := PageVariablesForAuthors{
 // 		Year:         now.Format("2006"),
@@ -442,7 +441,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 		UseAnalytics: useAnalytics,
 // 	}
 
-// 	authors, err := (*dao).GetAllAuthors()
+// 	authors, err := (*database).GetAllAuthors()
 // 	if err != nil {
 // 		log.Printf("Error getting authors: %v", err)
 // 		redirectToErrorPageWithMessageAndStatusCode(w, "error getting information from the database", http.StatusInternalServerError)
@@ -501,13 +500,13 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	return books, nil
 // }
 
-// func setUpPaginationFor(pageInt int, dao *dao.DAO, pageVariables *PageResultsVariables) error {
+// func setUpPaginationFor(pageInt int, database *database.DAO, pageVariables *PageResultsVariables) error {
 // 	now := time.Now()
 
 // 	pageVariables.Year = now.Format("2006")
 // 	pageVariables.SiteKey = captcha.SiteKey
 
-// 	totalBooks, err := (*dao).GetBookCount()
+// 	totalBooks, err := (*database).GetBookCount()
 // 	if err != nil {
 // 		log.Printf("Error getting total books: %v", err)
 // 		return err
@@ -551,7 +550,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	return nil
 // }
 
-// func AllBooksPage(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func AllBooksPage(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	page := r.URL.Query().Get("page")
 // 	if page == "" {
 // 		page = "1"
@@ -566,7 +565,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 
 // 	offset := (pageInt - 1) * numberOfResultsByPage
 
-// 	books, err := (*dao).GetBooksWithPagination(offset, numberOfResultsByPage)
+// 	books, err := (*database).GetBooksWithPagination(offset, numberOfResultsByPage)
 // 	if err != nil {
 // 		log.Printf("Error getting books: %v", err)
 // 		redirectToErrorPageWithMessageAndStatusCode(w, "error getting information from the database", http.StatusInternalServerError)
@@ -577,14 +576,14 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	pageVariables.UseAnalytics = useAnalytics
 // 	pageVariables.Results = books
 
-// 	err = setUpPaginationFor(pageInt, dao, &pageVariables)
+// 	err = setUpPaginationFor(pageInt, database, &pageVariables)
 // 	if err != nil {
 // 		log.Printf("Error setting up pagination: %v", err)
 // 		redirectToErrorPageWithMessageAndStatusCode(w, "error getting information from the database", http.StatusInternalServerError)
 // 		return
 // 	}
 
-// 	setAuthenticationForPageResults(r, &pageVariables, dao)
+// 	setAuthenticationForPageResults(r, &pageVariables, database)
 
 // 	templateDir := os.Getenv("TEMPLATE_DIR")
 // 	if templateDir == "" {
@@ -628,10 +627,10 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // //	})
 // //}
 
-// func BooksList(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func BooksList(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	authorParam := r.URL.Query().Get("start_with")
 
-// 	booksByAuthor, err := (*dao).GetBooksBySearchTypeCoincidence(authorParam, book.ByAuthor)
+// 	booksByAuthor, err := (*database).GetBooksBySearchTypeCoincidence(authorParam, book.ByAuthor)
 // 	if err != nil {
 // 		log.Printf("error: %v", err)
 // 		http.Error(w, "Database error", http.StatusInternalServerError)
@@ -682,8 +681,8 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	return count, nil
 // }
 
-// func BooksCount(dao *dao.DAO, w http.ResponseWriter) {
-// 	count, err := (*dao).GetBookCount()
+// func BooksCount(database *database.DAO, w http.ResponseWriter) {
+// 	count, err := (*database).GetBookCount()
 // 	if err != nil {
 // 		http.Error(w, "Database error", http.StatusInternalServerError)
 // 		return
@@ -695,7 +694,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	})
 // }
 
-// func SearchBooksPage(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func SearchBooksPage(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	bookQuery := r.URL.Query().Get("textSearch")
 // 	searchTypesStr := r.URL.Query().Get("searchType")
 // 	searchTypesParams := uniqueSearchTypes(strings.Split(searchTypesStr, ","))
@@ -711,7 +710,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 		searchType := parseBookSearchType(searchTypeParam)
 // 		switch searchType {
 // 		case book.ByTitle:
-// 			booksByTitle, err := (*dao).GetBooksBySearchTypeCoincidence(bookQuery, book.ByTitle)
+// 			booksByTitle, err := (*database).GetBooksBySearchTypeCoincidence(bookQuery, book.ByTitle)
 // 			if err != nil {
 // 				log.Printf("error: %v", err)
 // 				redirectToErrorPageWithMessageAndStatusCode(w, "Error getting information from the database", http.StatusInternalServerError)
@@ -721,7 +720,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 			results = append(results, booksByTitle...)
 
 // 		case book.ByAuthor:
-// 			booksByAuthor, err := (*dao).GetBooksBySearchTypeCoincidence(bookQuery, book.ByAuthor)
+// 			booksByAuthor, err := (*database).GetBooksBySearchTypeCoincidence(bookQuery, book.ByAuthor)
 // 			if err != nil {
 // 				log.Printf("error getting info from the database: %v", err)
 // 				redirectToErrorPageWithMessageAndStatusCode(w, "error getting info from the database", http.StatusInternalServerError)
@@ -800,7 +799,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	http.Redirect(w, r, url, http.StatusSeeOther)
 // }
 
-// func setDevCredentialsAndRedirect(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func setDevCredentialsAndRedirect(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	userInfo, err := getDevUserInfo()
 // 	if err != nil {
 // 		log.Printf("error: cannot get user info from Auth0: %v", err)
@@ -809,7 +808,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 		return
 // 	}
 
-// 	err = (*dao).AddUser(userInfo.Sub, userInfo.Email, userInfo.Name, "Google")
+// 	err = (*database).AddUser(userInfo.Sub, userInfo.Email, userInfo.Name, "Google")
 // 	if err != nil {
 // 		http.Error(w, "Error al guardar el usuario en la base de datos", http.StatusInternalServerError)
 // 		return
@@ -853,9 +852,9 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	}
 // }
 
-// func Auth0Callback(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func Auth0Callback(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	if isDevMode() {
-// 		setDevCredentialsAndRedirect(dao, w, r)
+// 		setDevCredentialsAndRedirect(database, w, r)
 
 // 		return
 // 	}
@@ -876,7 +875,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 		return
 // 	}
 
-// 	err = (*dao).AddUser(userInfo.Sub, userInfo.Email, userInfo.Name, "Google")
+// 	err = (*database).AddUser(userInfo.Sub, userInfo.Email, userInfo.Name, "Google")
 // 	if err != nil {
 // 		http.Error(w, "Error al guardar el usuario en la base de datos", http.StatusInternalServerError)
 // 		return
@@ -920,7 +919,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	}
 // }
 
-// func setAuthenticationForPageResults(r *http.Request, pageResultsVariables *PageResultsVariables, dao *dao.DAO) {
+// func setAuthenticationForPageResults(r *http.Request, pageResultsVariables *PageResultsVariables, database *database.DAO) {
 // 	dbID, err := getCurrentUserID(r)
 // 	if err != nil {
 // 		log.Printf("error: checking authentication information for user '%v'", err)
@@ -931,7 +930,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 			pageResultsVariables.IsAdmin = true
 // 			return
 // 		}
-// 		userInfo, err := (*dao).GetUserInfoByID(dbID)
+// 		userInfo, err := (*database).GetUserInfoByID(dbID)
 // 		if err != nil {
 // 			log.Printf("error: %v", err)
 // 		}
@@ -939,7 +938,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	}
 // }
 
-// func CheckLikeStatus(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func CheckLikeStatus(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	userID, err := getCurrentUserID(r)
 // 	if err != nil {
 // 		writeUnauthenticated(w)
@@ -950,7 +949,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	vars := mux.Vars(r)
 // 	bookID := vars["book_id"]
 
-// 	exists, err := (*dao).LikedBy(bookID, userID)
+// 	exists, err := (*database).LikedBy(bookID, userID)
 // 	if err != nil {
 // 		writeErrorLikeStatus(w, err)
 // 		return
@@ -965,7 +964,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	}
 // }
 
-// func LikeBook(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func LikeBook(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	userID, err := getCurrentUserID(r)
 // 	if err != nil {
 // 		http.Error(w, "Error al obtener información de la sesión", http.StatusInternalServerError)
@@ -978,7 +977,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	}
 // 	bookID := r.PostFormValue("book_id")
 
-// 	err = (*dao).LikeBook(bookID, userID)
+// 	err = (*database).LikeBook(bookID, userID)
 
 // 	if err != nil {
 // 		http.Error(w, "Error al dar like en la base de datos", http.StatusInternalServerError)
@@ -988,7 +987,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	w.Write([]byte("Liked successfully"))
 // }
 
-// func AddBook(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func AddBook(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	err := r.ParseMultipartForm(2 << 20)
 // 	if err != nil {
 // 		log.Printf("error adding book: %v", err)
@@ -1018,7 +1017,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	}
 // 	book.Image = imageData
 
-// 	err = (*dao).CreateBook(book)
+// 	err = (*database).CreateBook(book)
 // 	if err != nil {
 // 		http.Error(w, err.Error(), http.StatusInternalServerError)
 // 		return
@@ -1027,7 +1026,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	w.Write([]byte("Libro agregado con éxito"))
 // }
 
-// func UnlikeBook(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func UnlikeBook(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	userID, err := getCurrentUserID(r)
 // 	if err != nil {
 // 		http.Error(w, "Error al obtener información de la sesión", http.StatusInternalServerError)
@@ -1046,7 +1045,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 
 // 	fmt.Printf("debug:x trying to unlike book_id=(%s), user_id=(%s)\n", bookID, userID)
 
-// 	err = (*dao).UnlikeBook(bookID, userID)
+// 	err = (*database).UnlikeBook(bookID, userID)
 // 	if err != nil {
 // 		http.Error(w, "Error al quitar el like en la base de datos", http.StatusInternalServerError)
 // 		return
@@ -1055,7 +1054,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	w.Write([]byte("Unliked successfully"))
 // }
 
-// func LikesCount(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func LikesCount(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	bookID := r.URL.Query().Get("book_id")
 // 	if bookID == "" {
 // 		http.Error(w, "book_id is required", http.StatusBadRequest)
@@ -1069,7 +1068,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	}
 
 // 	var count int
-// 	count, err = (*dao).LikesCount(id)
+// 	count, err = (*database).LikesCount(id)
 // 	if err != nil {
 // 		http.Error(w, "Error querying the database", http.StatusInternalServerError)
 // 		return
@@ -1083,7 +1082,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	json.NewEncoder(w).Encode(resp)
 // }
 
-// func CreateDBFromFile(dao *dao.DAO, w http.ResponseWriter) {
+// func CreateDBFromFile(database *database.DAO, w http.ResponseWriter) {
 // 	libraryDir := "library"
 // 	libraryDirPath := filepath.Join(libraryDir, "books_db.toml")
 
@@ -1098,7 +1097,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 
 // 	startTime := time.Now()
 
-// 	err := (*dao).AddAll(library.Book)
+// 	err := (*database).AddAll(library.Book)
 // 	if err != nil {
 // 		writeErrorGeneralStatus(w, err)
 // 		return
@@ -1111,7 +1110,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	json.NewEncoder(w).Encode(map[string]string{"status": "OK"})
 // }
 
-// func InfoBook(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func InfoBook(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	idQueryParam := r.URL.Query().Get("id")
 
 // 	id, err := strconv.Atoi(idQueryParam)
@@ -1120,7 +1119,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 		return
 // 	}
 
-// 	bookByID, err := (*dao).GetBookByID(id)
+// 	bookByID, err := (*database).GetBookByID(id)
 // 	if err != nil {
 // 		log.Printf("error: getting information from the database")
 // 		redirectToErrorPageWithMessageAndStatusCode(w, "error getting information from the database", http.StatusInternalServerError)
@@ -1136,7 +1135,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 		UseAnalytics: useAnalytics,
 // 	}
 
-// 	setAuthenticationForPageResults(r, pageVariables, dao)
+// 	setAuthenticationForPageResults(r, pageVariables, database)
 
 // 	templatePath := getTemplatePath("book_info.html")
 
@@ -1154,7 +1153,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	}
 // }
 
-// func ModifyBook(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func ModifyBook(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	// TODO: check auth here
 // 	err := r.ParseMultipartForm(2 << 20)
 // 	if err != nil {
@@ -1177,14 +1176,14 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 		return
 // 	}
 
-// 	err = addImageToBook(dao, id, r)
+// 	err = addImageToBook(database, id, r)
 // 	if err != nil {
 // 		writeErrorGeneralStatus(w, err)
 
 // 		return
 // 	}
 
-// 	err = (*dao).UpdateBook(title, author, description, read, goodreadsLink, id)
+// 	err = (*database).UpdateBook(title, author, description, read, goodreadsLink, id)
 // 	if err != nil {
 // 		writeErrorGeneralStatus(w, err)
 
@@ -1194,7 +1193,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	w.Write([]byte("Libro modificado con exito"))
 // }
 
-// func addImageToBook(dao *dao.DAO, id int, r *http.Request) error {
+// func addImageToBook(database *database.DAO, id int, r *http.Request) error {
 // 	var imageData []byte
 // 	file, _, err := r.FormFile("image")
 // 	if err == nil {
@@ -1211,7 +1210,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 		return nil
 // 	}
 
-// 	err = (*dao).AddImageToBook(id, imageData)
+// 	err = (*database).AddImageToBook(id, imageData)
 // 	if err != nil {
 // 		return err
 // 	}
@@ -1219,7 +1218,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	return nil
 // }
 
-// func ModifyBookPage(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func ModifyBookPage(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	idQueryParam := r.URL.Query().Get("book_id")
 
 // 	id, err := strconv.Atoi(idQueryParam)
@@ -1228,7 +1227,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 		return
 // 	}
 
-// 	bookByID, err := (*dao).GetBookByID(id)
+// 	bookByID, err := (*database).GetBookByID(id)
 // 	if err != nil {
 // 		redirectToErrorPageWithMessageAndStatusCode(w, "error getting information from the database", http.StatusInternalServerError)
 // 		return
@@ -1325,7 +1324,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	}
 // }
 
-// func AddBookPage(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func AddBookPage(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	dbID, err := getCurrentUserID(r)
 // 	if err != nil {
 // 		redirectToErrorLoginPage(w)
@@ -1333,7 +1332,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	}
 
 // 	if !isDevMode() {
-// 		userInfo, err := (*dao).GetUserInfoByID(dbID)
+// 		userInfo, err := (*database).GetUserInfoByID(dbID)
 // 		if err != nil {
 // 			log.Printf("error: %v", err)
 // 			redirectToErrorLoginPage(w)
@@ -1372,7 +1371,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	}
 // }
 
-// func RemoveImage(dao *dao.DAO, w http.ResponseWriter, r *http.Request) {
+// func RemoveImage(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	// TODO: check auth
 // 	r.ParseForm()
 // 	imageIDParam := r.PostFormValue("image_id")
@@ -1383,7 +1382,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 		return
 // 	}
 
-// 	err = (*dao).RemoveImage(imageID)
+// 	err = (*database).RemoveImage(imageID)
 // 	if err != nil {
 // 		http.Error(w, "Error removing image", http.StatusInternalServerError)
 // 		return
@@ -1392,7 +1391,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	w.Write([]byte("Image removed OK..."))
 // }
 
-// func WishListBooksPage(dao *dao.DAO, w http.ResponseWriter, _ *http.Request) {
+// func WishListBooksPage(database *database.DAO, w http.ResponseWriter, _ *http.Request) {
 // 	templatePath := getTemplatePath("wishlistbooks.html")
 
 // 	t, err := template.ParseFiles(templatePath)
@@ -1405,7 +1404,7 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 
 // 	var results []book.WishListBook
 
-// 	results, err = (*dao).GetWishListBooks()
+// 	results, err = (*database).GetWishListBooks()
 // 	if err != nil {
 // 		redirectToErrorPageWithMessageAndStatusCode(w, err.Error(), http.StatusInternalServerError)
 // 		return
@@ -1432,3 +1431,41 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 
 // 	return runMode == "dev"
 // }
+
+func GetStatesFromCountry(w http.ResponseWriter, r *http.Request, cfg *config.Config) {
+	geoNameId := r.URL.Query().Get("geoNameId")
+	if geoNameId == "" {
+		//w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, "missing state param", http.StatusBadRequest)
+		return
+	}
+
+	url := fmt.Sprintf("http://api.geonames.org/childrenJSON?geonameId=%s&username=%s", geoNameId, cfg.GeoNamesUser)
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Printf("Error al realizar la solicitud HTTP: %v\n", err)
+		return
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Printf("error: closing body: %v", err)
+		}
+	}(resp.Body)
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Printf("Error al leer la respuesta HTTP: %v\n", err)
+		return
+	}
+
+	var geoNamesResponse model.GeoNamesResponse
+	err = json.Unmarshal(body, &geoNamesResponse)
+	if err != nil {
+		fmt.Printf("Error al parsear JSON: %v\n", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(geoNamesResponse)
+}

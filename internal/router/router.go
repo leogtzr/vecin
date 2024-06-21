@@ -2,7 +2,8 @@ package router
 
 import (
 	"net/http"
-	"vecin/internal/dao"
+	"vecin/internal/config"
+	"vecin/internal/database"
 	"vecin/internal/handler"
 	"vecin/internal/middleware"
 
@@ -20,13 +21,21 @@ type Router struct {
 
 type Routes []Router
 
-func createRoutes(dao *dao.DAO) *Routes {
+func createRoutes(dao *database.DAO, cfg *config.Config) *Routes {
 	routes := &Routes{
 		Router{
 			Name:        "IndexPage",
 			Method:      "GET",
 			Path:        "/",
 			HandlerFunc: handler.IndexPage,
+		},
+		Router{
+			Name:   "API - obtener los estados de un país",
+			Method: "GET",
+			Path:   "/api/states",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.GetStatesFromCountry(w, r, cfg)
+			},
 		},
 		Router{
 			Name:        "Landing Page",
@@ -53,8 +62,8 @@ func createRoutes(dao *dao.DAO) *Routes {
 	return routes
 }
 
-func NewRouter(dao *dao.DAO, limiter *rate.Limiter) *mux.Router {
-	routes := createRoutes(dao)
+func NewRouter(dao *database.DAO, limiter *rate.Limiter, cfg *config.Config) *mux.Router {
+	routes := createRoutes(dao, cfg)
 	router := mux.NewRouter().StrictSlash(true)
 
 	nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

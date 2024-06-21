@@ -26,3 +26,5 @@ database-data/
 vecin
 
 .env
+
+.idea/
