@@ -1432,10 +1432,12 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	return runMode == "dev"
 // }
 
-func GetStatesFromCountry(w http.ResponseWriter, r *http.Request, cfg *config.Config) {
-	geoNameId := r.URL.Query().Get("geoNameId")
+func GetRegionNameFromGeoNames(w http.ResponseWriter, r *http.Request, cfg *config.Config) {
+	geoNameId := r.URL.Query().Get("geonameId")
+
+	log.Printf("debug:x somebody is calling, geoNameId=%s", geoNameId)
+
 	if geoNameId == "" {
-		//w.WriteHeader(http.StatusBadRequest)
 		http.Error(w, "missing state param", http.StatusBadRequest)
 		return
 	}
@@ -1462,10 +1464,10 @@ func GetStatesFromCountry(w http.ResponseWriter, r *http.Request, cfg *config.Co
 	var geoNamesResponse model.GeoNamesResponse
 	err = json.Unmarshal(body, &geoNamesResponse)
 	if err != nil {
-		fmt.Printf("Error al parsear JSON: %v\n", err)
+		log.Printf("Error al parsear JSON: %v\n", err)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(geoNamesResponse)
+	_ = json.NewEncoder(w).Encode(geoNamesResponse)
 }

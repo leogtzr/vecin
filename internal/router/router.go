@@ -32,9 +32,9 @@ func createRoutes(dao *database.DAO, cfg *config.Config) *Routes {
 		Router{
 			Name:   "API - obtener los estados de un país",
 			Method: "GET",
-			Path:   "/api/states",
+			Path:   "/api/region",
 			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
-				handler.GetStatesFromCountry(w, r, cfg)
+				handler.GetRegionNameFromGeoNames(w, r, cfg)
 			},
 		},
 		Router{
