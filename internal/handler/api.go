@@ -15,6 +15,8 @@ import (
 func GetRegionNameFromGeoNames(w http.ResponseWriter, r *http.Request, cfg *config.Config) {
 	geoNameId := r.URL.Query().Get("geonameId")
 
+	log.Printf("Trying to get info for: %s", geoNameId)
+
 	if geoNameId == "" {
 		http.Error(w, "missing state param", http.StatusBadRequest)
 		return

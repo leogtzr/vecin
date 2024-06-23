@@ -6,3 +6,28 @@ http "http://api.geonames.org/childrenJSON?geonameId=4014336&username=leogtzr"
 
 # Obtener información de un país:
 http "http://api.geonames.org/countryInfoJSON?username=leogtzr"
+
+
+
+## Registrar Fraccionamiento
+### HTML Form Fields:
+
+nombreComunidad                 :
+tipoComunidad                   :
+modeloSuscripcion               :
+direccionCalle                  :
+direccionNumero                 :
+direccionColonia                :
+direccionCodigoPostal           :
+direccionCiudad                 :
+direccionEstado                 :
+direccionPais                   :
+referencias                     :
+descripcion                     :
+registranteNombre               :
+registranteApellido             :
+registranteTelefono             :
+registranteEmail                :
+habitante                       : si|no, para identificar si forma parte del fraccionamiento.
+registranteSignUpUserName       :
+registranteSignUpPassword       :
