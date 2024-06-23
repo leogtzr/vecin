@@ -4,20 +4,15 @@ import (
 	"crypto/rand"
 	"database/sql"
 	"encoding/base64"
-	"encoding/json"
-	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
-	"io"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"time"
-	"vecin/internal/config"
 	"vecin/internal/database"
 	"vecin/internal/middleware"
-	model "vecin/internal/model/geonames"
 )
 
 var templateHTMLFiles = []string{
@@ -104,7 +99,7 @@ func isLoggedIn(r *http.Request) bool {
 }
 
 // IndexPage renders the home or index page.
-// path: "/""
+// path: "/"
 func IndexPage(w http.ResponseWriter, r *http.Request) {
 	pageVariables := PageVariables{
 		Year:     time.Now().Format("2006"),
@@ -1431,41 +1426,3 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 
 // 	return runMode == "dev"
 // }
-
-func GetRegionNameFromGeoNames(w http.ResponseWriter, r *http.Request, cfg *config.Config) {
-	geoNameId := r.URL.Query().Get("geonameId")
-
-	if geoNameId == "" {
-		http.Error(w, "missing state param", http.StatusBadRequest)
-		return
-	}
-
-	url := fmt.Sprintf("http://api.geonames.org/childrenJSON?geonameId=%s&username=%s", geoNameId, cfg.GeoNamesUser)
-	resp, err := http.Get(url)
-	if err != nil {
-		log.Printf("Error al realizar la solicitud HTTP: %v\n", err)
-		return
-	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Printf("error: closing body: %v", err)
-		}
-	}(resp.Body)
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Printf("Error al leer la respuesta HTTP: %v\n", err)
-		return
-	}
-
-	var geoNamesResponse model.GeoNamesResponse
-	err = json.Unmarshal(body, &geoNamesResponse)
-	if err != nil {
-		log.Printf("Error al parsear JSON: %v\n", err)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(geoNamesResponse)
-}
