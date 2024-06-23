@@ -1426,3 +1426,13 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 
 // 	return runMode == "dev"
 // }
+
+func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	//username := r.FormValue("username")
+	//password := r.FormValue("password")
+}

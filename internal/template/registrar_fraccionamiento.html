@@ -20,7 +20,7 @@
             <div class="row justify-content-center">
                 <div class="col-md-8">
                     <h2 class="text-center">Registro de Comunidad</h2>
-                    <form id="registroComunidadForm" action="/registrar-fracc" action="post">
+                    <form id="registroComunidadForm" action="/registrar-fracc" method="post">
                         <div class="form-group">
                             <label for="nombreComunidad">Nombre de la Comunidad</label>
                             <input type="text" class="form-control" id="nombreComunidad" name="nombreComunidad" placeholder="Ejemplo: Fraccionamiento Calzada del Bosque" required>
@@ -90,7 +90,7 @@
     
                         <div class="form-group">
                             <label for="referencias">Referencias (Opcional)</label>
-                            <textarea class="form-control" id="referencias" name="referencias" rows="3" placeholder="Ingresa las referencias"></textarea>
+                            <textarea class="form-control" id="referencias" name="referencias" rows="3" placeholder="Ejemplo: Sobre la Avenida Tomás Valles y Cantera"></textarea>
                         </div>
     
                         <div class="form-group">
@@ -106,8 +106,8 @@
                         </div>
     
                         <div class="form-group">
-                            <label for="registranteApellido">Apellido (s)</label>
-                            <input type="text" class="form-control" id="registranteApellido" name="registranteApellido" placeholder="Ingresa tu apellido" required>
+                            <label for="registranteApellido">Apellidos</label>
+                            <input type="text" class="form-control" id="registranteApellido" name="registranteApellido" placeholder="Ingresa tus apellidos" required>
                         </div>
     
                         <div class="form-group">

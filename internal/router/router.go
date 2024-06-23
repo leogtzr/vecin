@@ -50,6 +50,14 @@ func createRoutes(dao *database.DAO, cfg *config.Config) *Routes {
 			HandlerFunc: handler.RegisterFracc,
 		},
 		Router{
+			Name:   "Form - Registrar Fraccionamiento",
+			Method: "POST",
+			Path:   "/registrar-fracc",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.FormRegisterFracc(dao, w, r)
+			},
+		},
+		Router{
 			Name:   "Login",
 			Method: "POST",
 			Path:   "/login",
