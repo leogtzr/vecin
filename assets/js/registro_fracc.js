@@ -14,7 +14,7 @@ $(document).ready(function() {
     function fetchStatesByCountry(countryId) {
         var username = 'leogtzr';
 
-        var url = `api/region?geonameId=${countryId}&username=${username}`;
+        var url = `api/region?geonameId=${countryId}`;
 
         $.getJSON(url, function(data) {
             var estados = data.geonames;
@@ -33,7 +33,7 @@ $(document).ready(function() {
     // cities or municipalities...
     function fetchCitiesByStateId(stateId) {
         var username = 'leogtzr';
-        var ciudadesUrl = `api/region?geonameId=${stateId}&username=${username}`;
+        var ciudadesUrl = `api/region?geonameId=${stateId}`;
 
         $.getJSON(ciudadesUrl, function(data) {
             var ciudades = data.geonames;

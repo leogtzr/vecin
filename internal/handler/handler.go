@@ -1435,8 +1435,6 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 func GetRegionNameFromGeoNames(w http.ResponseWriter, r *http.Request, cfg *config.Config) {
 	geoNameId := r.URL.Query().Get("geonameId")
 
-	log.Printf("debug:x somebody is calling, geoNameId=%s", geoNameId)
-
 	if geoNameId == "" {
 		http.Error(w, "missing state param", http.StatusBadRequest)
 		return
@@ -1445,7 +1443,7 @@ func GetRegionNameFromGeoNames(w http.ResponseWriter, r *http.Request, cfg *conf
 	url := fmt.Sprintf("http://api.geonames.org/childrenJSON?geonameId=%s&username=%s", geoNameId, cfg.GeoNamesUser)
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Printf("Error al realizar la solicitud HTTP: %v\n", err)
+		log.Printf("Error al realizar la solicitud HTTP: %v\n", err)
 		return
 	}
 	defer func(Body io.ReadCloser) {
@@ -1457,7 +1455,7 @@ func GetRegionNameFromGeoNames(w http.ResponseWriter, r *http.Request, cfg *conf
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Printf("Error al leer la respuesta HTTP: %v\n", err)
+		log.Printf("Error al leer la respuesta HTTP: %v\n", err)
 		return
 	}
 
