@@ -94,13 +94,8 @@ $(document).ready(function() {
                 success: function(response) {
                     console.log('OK', response);
                     const infoModal = clickedElement.find('.info-modal');
-                    infoModal.text('Fraccionamiento registrado correctamente');
-                    infoModal.show();
+                    $('#infoModal').modal('show');
 
-                    setTimeout(() => {
-                        infoModal.hide();
-                        // window.location.href = `modify?book_id=${bookID}`;
-                    }, 800);
                 },
                 error: function(xhr, status, error) {
                     console.error('Error:', error);
@@ -141,5 +136,9 @@ $(document).ready(function() {
         // ToDo: change this to our WS endpoint:
         fetchStatesByCountry(geonameIdMexico);
     }
+
+    $('#infoModal').on('click', '#okButton', function() {
+        window.location.href = '/';
+    });
 
 });
