@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"database/sql"
 	"encoding/base64"
+	"encoding/json"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"log"
@@ -13,6 +14,7 @@ import (
 	"time"
 	"vecin/internal/database"
 	"vecin/internal/middleware"
+	"vecin/internal/model"
 )
 
 var templateHTMLFiles = []string{
@@ -293,16 +295,8 @@ func RegisterFracc(w http.ResponseWriter, r *http.Request) {
 // }
 
 func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMessage string, httpStatusCode int) {
-	templatePath := getTemplatePath("error5xx.html")
-
-	t, err := template.ParseFiles(templatePath)
-	if err != nil {
-		log.Printf("error: %v", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
 	type ErrorVariables struct {
+		AppName      string
 		Year         string
 		ErrorMessage string
 	}
@@ -310,13 +304,24 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 	pageVariables := ErrorVariables{
 		Year:         time.Now().Format("2006"),
 		ErrorMessage: errorMessage,
+		AppName:      "Vecin",
 	}
 
 	w.WriteHeader(httpStatusCode)
 
-	err = t.Execute(w, pageVariables)
+	tmpl, err := template.ParseFiles(
+		addTemplateFiles("internal/template/error5xx.html")...,
+	)
 	if err != nil {
-		log.Printf("error: %v", err)
+		log.Printf("Error parsing templates: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.ExecuteTemplate(w, "base", pageVariables)
+	if err != nil {
+		log.Printf("Error executing template: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 }
@@ -1433,43 +1438,42 @@ func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	nombreComunidad := r.FormValue("nombreComunidad")
-	tipoComunidad := r.FormValue("tipoComunidad")
-	modeloSuscripcion := r.FormValue("modeloSuscripcion")
-	direccionCalle := r.FormValue("direccionCalle")
-	direccionNumero := r.FormValue("direccionNumero")
-	direccionColonia := r.FormValue("direccionColonia")
-	direccionCodigoPostal := r.FormValue("direccionCodigoPostal")
-	direccionCiudad := r.FormValue("direccionCiudad")
-	direccionEstado := r.FormValue("direccionEstado")
-	direccionPais := r.FormValue("direccionPais")
-	referencias := r.FormValue("referencias")
-	descripcion := r.FormValue("descripcion")
-	registranteNombre := r.FormValue("registranteNombre")
-	registranteApellido := r.FormValue("registranteApellido")
-	registranteTelefono := r.FormValue("registranteTelefono")
-	registranteEmail := r.FormValue("registranteEmail")
-	habitante := r.FormValue("habitante")
-	registranteSignUpUserName := r.FormValue("registranteSignUpUserName")
-	registranteSignUpPassword := r.FormValue("registranteSignUpPassword")
+	var formData model.FormData
+	err := json.NewDecoder(r.Body).Decode(&formData)
+	if err != nil {
+		http.Error(w, "Unable to parse JSON", http.StatusBadRequest)
+		return
+	}
 
-	log.Printf("nombreComunidad = %s", nombreComunidad)
-	log.Printf("tipoComunidad = %s", tipoComunidad)
-	log.Printf("modeloSuscripcion = %s", modeloSuscripcion)
-	log.Printf("direccionCalle = %s", direccionCalle)
-	log.Printf("direccionNumero = %s", direccionNumero)
-	log.Printf("direccionColonia = %s", direccionColonia)
-	log.Printf("direccionCodigoPostal = %s", direccionCodigoPostal)
-	log.Printf("direccionCiudad = %s", direccionCiudad)
-	log.Printf("direccionEstado = %s", direccionEstado)
-	log.Printf("direccionPais = %s", direccionPais)
-	log.Printf("referencias = %s", referencias)
-	log.Printf("descripcion = %s", descripcion)
-	log.Printf("registranteNombre = %s", registranteNombre)
-	log.Printf("registranteApellido = %s", registranteApellido)
-	log.Printf("registranteTelefono = %s", registranteTelefono)
-	log.Printf("registranteEmail = %s", registranteEmail)
-	log.Printf("habitante = %s", habitante)
-	log.Printf("registranteSignUpUserName = %s", registranteSignUpUserName)
-	log.Printf("registranteSignUpPassword = %s", registranteSignUpPassword)
+	log.Printf("nombreComunidad = (%s)", formData.NombreComunidad)
+	log.Printf("tipoComunidad = (%s)", formData.TipoComunidad)
+	log.Printf("modeloSuscripcion = (%s)", formData.ModeloSuscripcion)
+	log.Printf("direccionCalle = (%s)", formData.DireccionCalle)
+	log.Printf("direccionNumero = (%s)", formData.DireccionNumero)
+	log.Printf("direccionColonia = (%s)", formData.DireccionColonia)
+	log.Printf("direccionCodigoPostal = (%s)", formData.DireccionCodigoPostal)
+	log.Printf("direccionCiudad = (%s)", formData.DireccionCiudad)
+	log.Printf("direccionEstado = (%s)", formData.DireccionEstado)
+	log.Printf("direccionPais = (%s)", formData.DireccionPais)
+	log.Printf("referencias = (%s)", formData.Referencias)
+	log.Printf("descripcion = (%s)", formData.Descripcion)
+	log.Printf("registranteNombre = (%s)", formData.RegistranteNombre)
+	log.Printf("registranteApellido = (%s)", formData.RegistranteApellido)
+	log.Printf("registranteTelefono = (%s)", formData.RegistranteTelefono)
+	log.Printf("registranteEmail = (%s)", formData.RegistranteEmail)
+	log.Printf("habitante = (%s)", formData.Habitante)
+	log.Printf("registranteSignUpUserName = (%s)", formData.RegistranteSignUpUserName)
+	log.Printf("registranteSignUpPassword = (%s)", formData.RegistranteSignUpPassword)
+
+	w.WriteHeader(http.StatusOK)
+	resp := map[string]string{
+		"message": "Register OK",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(resp)
+}
+
+func GenError(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
+	redirectToErrorPageWithMessageAndStatusCode(w, "error: just testing...", http.StatusInternalServerError)
 }

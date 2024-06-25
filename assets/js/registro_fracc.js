@@ -24,7 +24,6 @@ $(document).ready(function() {
             estados.forEach(function(estado) {
                 var option =
                     `<option value="${estado.name}" name="${estado.name}" data-regionId="${estado.geonameId}">${estado.name}</option>`;
-                console.log('Adding option:', option);
                 $direccionEstado.append(option);
             });
 
@@ -52,6 +51,62 @@ $(document).ready(function() {
             console.log('Error calling URL');
         });
     }
+
+        $('#registroComunidadForm').on('submit', function(e) {
+            e.preventDefault();
+
+            var formData = new FormData(this);
+            console.log("nombreComunidad=", $('#nombreComunidad').val());
+
+            const clickedElement = $(this);
+
+            for (var pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+
+            var formData = {};
+            formData['nombreComunidad'] = $('#nombreComunidad').val();
+            formData['tipoComunidad'] = $('#tipoComunidad').val();
+            formData['modeloSuscripcion'] = $('#modeloSuscripcion').val();
+            formData['direccionCalle'] = $('#direccionCalle').val();
+            formData['direccionNumero'] = $('#direccionNumero').val();
+            formData['direccionColonia'] = $('#direccionColonia').val();
+            formData['direccionCodigoPostal'] = $('#direccionCodigoPostal').val();
+            formData['direccionEstado'] = $('#direccionEstado').val();
+            formData['direccionCiudad'] = $('#direccionCiudad').val();
+            formData['direccionPais'] = $('#direccionPais').val();
+            formData['referencias'] = $('#referencias').val();
+            formData['descripcion'] = $('#descripcion').val();
+            formData['registranteNombre'] = $('#registranteNombre').val();
+            formData['registranteApellido'] = $('#registranteApellido').val();
+            formData['registranteTelefono'] = $('#registranteTelefono').val();
+            formData['registranteEmail'] = $('#registranteEmail').val();
+            formData['habitante'] = $('#habitante').val();
+            formData['registranteSignUpUserName'] = $('#registranteSignUpUserName').val();
+            formData['registranteSignUpPassword'] = $('#registranteSignUpPassword').val();
+
+            console.log('Will try to send: ', formData);
+            $.ajax({
+                url: '/registrar-fracc',
+                type: 'POST',
+                data: JSON.stringify(formData),
+                contentType: 'application/json',
+                success: function(response) {
+                    console.log('OK', response);
+                    const infoModal = clickedElement.find('.info-modal');
+                    infoModal.text('Fraccionamiento registrado correctamente');
+                    infoModal.show();
+
+                    setTimeout(() => {
+                        infoModal.hide();
+                        // window.location.href = `modify?book_id=${bookID}`;
+                    }, 800);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
 
     $('#direccionEstado').on('change', function() {
         var estadoElement = $('#direccionEstado option:selected');
@@ -86,4 +141,5 @@ $(document).ready(function() {
         // ToDo: change this to our WS endpoint:
         fetchStatesByCountry(geonameIdMexico);
     }
+
 });

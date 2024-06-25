@@ -12,6 +12,16 @@ CREATE TABLE comunidad (
     modelo_suscripcion VARCHAR(20) NOT NULL CHECK (modelo_suscripcion IN ('Mensual', 'Bimestral', 'Anual'))
 );
 
+CREATE TABLE registrante (
+     registrante_id SERIAL PRIMARY KEY,
+     nombre VARCHAR(100) NOT NULL,
+     apellido VARCHAR(100) NOT NULL,
+     telefono VARCHAR(15),
+     email VARCHAR(100) NOT NULL,
+     comunidad_id INT REFERENCES comunidad(comunidad_id)
+);
+
+
 CREATE TABLE registro (
     registro_id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,

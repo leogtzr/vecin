@@ -65,6 +65,14 @@ func createRoutes(dao *database.DAO, cfg *config.Config) *Routes {
 				handler.Login(dao, w, r)
 			},
 		},
+		Router{
+			Name:   "Gen Error - Remove this",
+			Method: "GET",
+			Path:   "/generror",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.GenError(dao, w, r)
+			},
+		},
 	}
 
 	return routes

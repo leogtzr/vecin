@@ -19,7 +19,7 @@
             <div class="row justify-content-center">
                 <div class="col-md-8">
                     <h2 class="text-center">Registro de Comunidad</h2>
-                    <form id="registroComunidadForm" action="/registrar-fracc" method="post">
+                    <form id="registroComunidadForm" action="/registrar-fracc" method="post" enctype="multipart/form-data">
                         <div class="form-group">
                             <label for="nombreComunidad">Nombre de la Comunidad</label>
                             <input type="text" class="form-control" id="nombreComunidad" name="nombreComunidad" placeholder="Ejemplo: Fraccionamiento Calzada del Bosque" required>
@@ -138,7 +138,8 @@
                                 <input type="password" class="form-control" id="registranteSignUpPassword" name="registranteSignUpPassword" placeholder="Ingresa tu contraseña">
                             </div>
                         </div>
-    
+
+                        <div class="info-modal"></div>
                         <button type="submit" class="btn btn-success btn-block">Registrar Comunidad</button>
                     </form>
                 </div>

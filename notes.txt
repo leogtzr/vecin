@@ -1,3 +1,12 @@
+## Some info about the Postgres Database:
+
+### How to create the user:
+sudo -u postgres psql
+CREATE DATABASE vecin;
+CREATE USER leo WITH ENCRYPTED PASSWORD 'lein23';
+GRANT ALL PRIVILEGES ON DATABASE vecin TO leo;
+
+
 # Obtener info de los estados en México:
 http "http://api.geonames.org/childrenJSON?geonameId=3996063&username=leogtzr"
 
