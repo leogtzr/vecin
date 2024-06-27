@@ -15,9 +15,11 @@
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
+            {{if .LoggedIn}}
             <li class="nav-item">
                 <a class="nav-link" href="/admin">Admin</a>
             </li>
+            {{end}}
         </ul>
     </div>
 </nav>

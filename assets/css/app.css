@@ -36,3 +36,16 @@ body {
 .card {
     cursor: pointer;
 }
+
+.btn-question-circle {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 20px; /* Aumentar el tamaño de la fuente */
+    line-height: 32px; /* Asegurar que el texto esté centrado verticalmente */
+    display: inline-block;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+}

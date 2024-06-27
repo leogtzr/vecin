@@ -14,7 +14,11 @@
                         <input type="password" class="form-control" id="password" placeholder="Ingresa tu contraseña" required>
                     </div>
                     <div class="form-group">
-                        <label for="fraccID">ID del Fraccionamiento</label>
+                        <label for="fraccID">ID del Fraccionamiento
+                            <button type="button" class="btn btn-link p-0 ml-1 btn-question-circle" data-toggle="modal" data-target="#fraccIDModal">
+                                ?
+                            </button>
+                        </label>
                         <input type="number" class="form-control" id="fraccID" placeholder="Ejemplo: 52" required>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
@@ -30,6 +34,25 @@
                 </div>
                 <div class="mt-4 text-center">
                     <a href="/que-es-vecin">¿Qué es Vecin?</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="fraccIDModal" tabindex="-1" role="dialog" aria-labelledby="fraccIDModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="fraccIDModalLabel">¿Qué es el ID del Fraccionamiento?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    El ID del Fraccionamiento es un número único que identifica a tu comunidad o fraccionamiento. Puedes obtener este ID contactando al administrador de tu fraccionamiento.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
