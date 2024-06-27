@@ -88,7 +88,9 @@ $(document).ready(function() {
                 data: JSON.stringify(formData),
                 contentType: 'application/json',
                 success: function(response) {
-                    console.log('OK', response);
+                    console.log('OK');
+                    console.log(response);
+
                     const infoModal = clickedElement.find('.info-modal');
                     $('#infoModal').modal('show');
 

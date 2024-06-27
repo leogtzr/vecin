@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"log"
@@ -1469,11 +1470,12 @@ func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request
 	log.Printf("registranteSignUpPassword = (%s)", formData.RegistranteSignUpPassword)
 
 	// Save the data:
-	_, _ = (*dao).SaveCommunity(formData)
+	comunidadID, err := (*dao).SaveCommunity(formData)
 
 	w.WriteHeader(http.StatusOK)
 	resp := map[string]string{
-		"message": "Register OK",
+		"message":           "Register OK",
+		"fraccionamientoID": fmt.Sprintf("%d", comunidadID),
 	}
 
 	w.Header().Set("Content-Type", "application/json")

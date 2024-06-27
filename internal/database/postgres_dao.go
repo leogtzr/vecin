@@ -98,7 +98,7 @@ func (dao *daoImpl) SaveCommunity(data model.RegisterFormData) (int, error) {
 		return -1, err
 	}
 
-	log.Printf("debug:x done saving to comunidad")
+	log.Printf("debug:x done saving to comunidad, id=%d", comunidadID)
 
 	_, err = dao.db.Exec(`
         INSERT INTO registro (nombre, telefono, correo, comunidad_id) VALUES ($1, $2, $3, $4)
@@ -121,8 +121,7 @@ func (dao *daoImpl) SaveCommunity(data model.RegisterFormData) (int, error) {
 
 	log.Printf("debug:x done saving to habitante, DONE")
 
-	// TODO: change the return type (?)
-	return 0, nil
+	return comunidadID, nil
 }
 
 // func (database *postgresBookDAO) CreateBook(book book.BookInfo) error {
