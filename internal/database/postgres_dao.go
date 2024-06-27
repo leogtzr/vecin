@@ -2,6 +2,8 @@ package database
 
 import (
 	"database/sql"
+	"errors"
+	"log"
 	"vecin/internal/model"
 )
 
@@ -55,7 +57,7 @@ import (
 // }
 
 func (dao *daoImpl) Close() error {
-	return nil
+	return dao.db.Close()
 }
 
 func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
@@ -66,13 +68,61 @@ func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
 	var user model.Usuario
 	err := row.Scan(&user.ID, &user.NombreUsuario, &user.NombreCompleto, &user.Email, &user.HashContrasena, &user.FechaCreacion)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, err // Usuario no encontrado
 		}
-		return nil, err // Otro error
+		return nil, err
 	}
 
 	return &user, nil
+}
+
+func (dao *daoImpl) SaveCommunity(data model.RegisterFormData) (int, error) {
+	var comunidadID int
+	var err error
+	err = dao.db.QueryRow(`
+        INSERT INTO comunidad (nombre, direccion_calle, direccion_numero, direccion_colonia, direccion_cp, direccion_ciudad, direccion_estado, direccion_pais, tipo, modelo_suscripcion)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING comunidad_id
+    `,
+		data.NombreComunidad,
+		data.DireccionCalle,
+		data.DireccionNumero,
+		data.DireccionColonia,
+		data.DireccionCodigoPostal,
+		data.DireccionCiudad,
+		data.DireccionEstado,
+		data.DireccionPais,
+		data.TipoComunidad,
+		data.ModeloSuscripcion).Scan(&comunidadID)
+	if err != nil {
+		return -1, err
+	}
+
+	log.Printf("debug:x done saving to comunidad")
+
+	_, err = dao.db.Exec(`
+        INSERT INTO registro (nombre, telefono, correo, comunidad_id) VALUES ($1, $2, $3, $4)
+    `, data.RegistranteNombre+" "+data.RegistranteApellido, data.RegistranteTelefono, data.RegistranteEmail, comunidadID)
+	if err != nil {
+		return -1, err
+	}
+
+	log.Printf("debug:x done saving to registro")
+
+	// Si es habitante, insertar en la tabla habitante
+	if data.Habitante == "yes" {
+		_, err = dao.db.Exec(`
+            INSERT INTO habitante (nombre, apellido, telefono, email) VALUES ($1, $2, $3, $4)`,
+			data.RegistranteNombre, data.RegistranteApellido, data.RegistranteTelefono, data.RegistranteEmail)
+		if err != nil {
+			return -1, err
+		}
+	}
+
+	log.Printf("debug:x done saving to habitante, DONE")
+
+	// TODO: change the return type (?)
+	return 0, nil
 }
 
 // func (database *postgresBookDAO) CreateBook(book book.BookInfo) error {

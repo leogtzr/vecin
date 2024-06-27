@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"log"
@@ -163,7 +164,7 @@ func Login(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 
 	user, err := (*dao).GetUserByUsername(username)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			http.Error(w, "Usuario o contraseña incorrectos", http.StatusUnauthorized)
 			return
 		}
@@ -1438,7 +1439,7 @@ func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	var formData model.FormData
+	var formData model.RegisterFormData
 	err := json.NewDecoder(r.Body).Decode(&formData)
 	if err != nil {
 		http.Error(w, "Unable to parse JSON", http.StatusBadRequest)
@@ -1464,6 +1465,9 @@ func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request
 	log.Printf("habitante = (%s)", formData.Habitante)
 	log.Printf("registranteSignUpUserName = (%s)", formData.RegistranteSignUpUserName)
 	log.Printf("registranteSignUpPassword = (%s)", formData.RegistranteSignUpPassword)
+
+	// Save the data:
+	_, _ = (*dao).SaveCommunity(formData)
 
 	w.WriteHeader(http.StatusOK)
 	resp := map[string]string{

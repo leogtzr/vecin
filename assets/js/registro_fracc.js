@@ -56,34 +56,30 @@ $(document).ready(function() {
             e.preventDefault();
 
             var formData = new FormData(this);
-            console.log("nombreComunidad=", $('#nombreComunidad').val());
-
             const clickedElement = $(this);
 
-            for (var pair of formData.entries()) {
-                console.log(pair[0] + ': ' + pair[1]);
-            }
-
-            var formData = {};
-            formData['nombreComunidad'] = $('#nombreComunidad').val();
-            formData['tipoComunidad'] = $('#tipoComunidad').val();
-            formData['modeloSuscripcion'] = $('#modeloSuscripcion').val();
-            formData['direccionCalle'] = $('#direccionCalle').val();
-            formData['direccionNumero'] = $('#direccionNumero').val();
-            formData['direccionColonia'] = $('#direccionColonia').val();
-            formData['direccionCodigoPostal'] = $('#direccionCodigoPostal').val();
-            formData['direccionEstado'] = $('#direccionEstado').val();
-            formData['direccionCiudad'] = $('#direccionCiudad').val();
-            formData['direccionPais'] = $('#direccionPais').val();
-            formData['referencias'] = $('#referencias').val();
-            formData['descripcion'] = $('#descripcion').val();
-            formData['registranteNombre'] = $('#registranteNombre').val();
-            formData['registranteApellido'] = $('#registranteApellido').val();
-            formData['registranteTelefono'] = $('#registranteTelefono').val();
-            formData['registranteEmail'] = $('#registranteEmail').val();
-            formData['habitante'] = $('#habitante').val();
-            formData['registranteSignUpUserName'] = $('#registranteSignUpUserName').val();
-            formData['registranteSignUpPassword'] = $('#registranteSignUpPassword').val();
+            var formData = {
+                nombreComunidad: $('#nombreComunidad').val(),
+                tipoComunidad: $('#tipoComunidad').val(),
+                modeloSuscripcion: $('#modeloSuscripcion').val(),
+                direccionCalle: $('#direccionCalle').val(),
+                direccionNumero: $('#direccionNumero').val(),
+                direccionColonia: $('#direccionColonia').val(),
+                direccionCodigoPostal: $('#direccionCodigoPostal').val(),
+                direccionEstado: $('#direccionEstado').val(),
+                direccionCiudad: $('#direccionCiudad').val(),
+                direccionPais: $('#direccionPais').val(),
+                referencias: $('#referencias').val(),
+                descripcion: $('#descripcion').val(),
+                registranteNombre: $('#registranteNombre').val(),
+                registranteApellido: $('#registranteApellido').val(),
+                registranteTelefono: $('#registranteTelefono').val(),
+                registranteUsername: $('#registranteUsername').val(),
+                registranteEmail: $('#registranteEmail').val(),
+                habitante: $('#habitante').val(),
+                registranteSignUpUserName: $('#registranteSignUpUserName').val(),
+                registranteSignUpPassword: $('#registranteSignUpPassword').val()
+            };
 
             console.log('Will try to send: ', formData);
             $.ajax({
@@ -108,9 +104,6 @@ $(document).ready(function() {
         var estado = estadoElement.attr('data-regionId');
 
         var pais = $('#direccionPais').val();
-
-        console.log('debug:x Change event for estado:', estado, ', pais:', pais);
-        console.log('debug:x estado', estadoElement.val());
 
         // TODO: quizás no necesitamos verificar el país.
         if (estado && pais) {
