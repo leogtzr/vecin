@@ -1442,7 +1442,9 @@ func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request
 	var formData model.RegisterFormData
 	err := json.NewDecoder(r.Body).Decode(&formData)
 	if err != nil {
-		http.Error(w, "Unable to parse JSON", http.StatusBadRequest)
+		log.Printf("Error parsing form: %v", err)
+		redirectToErrorPageWithMessageAndStatusCode(w, "Unable to process input data", http.StatusInternalServerError)
+
 		return
 	}
 
