@@ -1485,3 +1485,28 @@ func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request
 func GenError(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	redirectToErrorPageWithMessageAndStatusCode(w, "error: just testing...", http.StatusInternalServerError)
 }
+
+func ViewFraccs(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
+	now := time.Now()
+
+	pageVariables := PageVariables{
+		Year:    now.Format("2006"),
+		AppName: "Vecin",
+	}
+
+	tmpl, err := template.ParseFiles(
+		addTemplateFiles("internal/template/view-fraccs.html")...,
+	)
+	if err != nil {
+		log.Printf("Error parsing templates: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.ExecuteTemplate(w, "base", pageVariables)
+	if err != nil {
+		log.Printf("Error executing template: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+}

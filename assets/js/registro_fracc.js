@@ -133,7 +133,7 @@ $(document).ready(function() {
     }
 
     $('#infoModal').on('click', '#okButton', function() {
-        window.location.href = '/';
+        window.location.href = '/view-fraccs';
     });
 
 });

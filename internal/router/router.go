@@ -58,6 +58,14 @@ func createRoutes(dao *database.DAO, cfg *config.Config) *Routes {
 			},
 		},
 		Router{
+			Name:   "View Fraccs",
+			Method: "GET",
+			Path:   "/view-fraccs",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.ViewFraccs(dao, w, r)
+			},
+		},
+		Router{
 			Name:   "Login",
 			Method: "POST",
 			Path:   "/login",
