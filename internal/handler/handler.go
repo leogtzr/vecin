@@ -189,6 +189,8 @@ func Login(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 // RegisterFracc handles the rendering to register a fraccionamiento.
 // path: "/registrar-fraccionamiento"
 func RegisterFracc(w http.ResponseWriter, r *http.Request) {
+	// Verificar si el usuario no ha hecho login, si no mandar a hacer una cuenta.
+
 	pageVariables := PageVariables{
 		Year:    time.Now().Format("2006"),
 		AppName: "Vecin",

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vecin</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .custom-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 80vh; /* Adjust the height as necessary */
+        }
+        .main-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        .sub-text {
+            font-size: 1.25rem;
+        }
+        .emoji {
+            font-size: 4rem;
+        }
+        .left-align {
+            text-align: left;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #f8f9fa;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .footer .left,
+        .footer .right {
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .footer .left {
+            text-align: left;
+            width: 50%;
+        }
+        .footer .right {
+            text-align: right;
+            width: 50%;
+        }
+        .footer .social-emoji {
+            font-size: 1.5rem;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <div class="container custom-nav">
+            <a class="navbar-brand" href="#">Vecin</a>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Registrar como
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="#">Habitante</a>
+                    <a class="dropdown-item" href="#">Nuevo Fraccionamiento</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container content">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-md-8 left-align">
+                <p class="main-text">Rápido, inteligente y fácil de usar</p>
+                <p class="sub-text">La mejor manera de administrar un fraccionamiento, departamentos o tu hogar.</p>
+                <div class="dropdown mt-3">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Registrar como
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+                        <a class="dropdown-item" href="#">Habitante</a>
+                        <a class="dropdown-item" href="#">Nuevo Fraccionamiento</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-right">
+                <span class="emoji">🏡</span>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 left">
+                    <a href="#">Vecin</a> | <a href="#">Términos y condiciones</a>
+                </div>
+                <div class="col-md-6 right">
+                    <span class="social-emoji">🔵</span> <!-- Facebook emoji -->
+                    <span class="social-emoji">🐦</span> <!-- Twitter emoji -->
+                    <span class="social-emoji">📸</span> <!-- Instagram emoji -->
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
