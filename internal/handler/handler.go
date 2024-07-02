@@ -1590,3 +1590,27 @@ func Register(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func CreateAccount(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
+	templatePath := getTemplatePath("create-account.html")
+
+	t, err := template.ParseFiles(templatePath)
+	if err != nil {
+		log.Printf("error: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	type ErrorVariables struct {
+		Year         string
+		ErrorMessage string
+	}
+
+	w.WriteHeader(http.StatusUnauthorized)
+
+	err = t.Execute(w, nil)
+	if err != nil {
+		log.Printf("error: %v", err)
+		return
+	}
+}

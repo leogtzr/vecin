@@ -81,6 +81,15 @@ func createRoutes(dao *database.DAO, cfg *config.Config) *Routes {
 				handler.Login(dao, w, r)
 			},
 		},
+		// /create-account
+		Router{
+			Name:   "Create Account - Page",
+			Method: "GET",
+			Path:   "/create-account",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.CreateAccount(dao, w, r)
+			},
+		},
 		Router{
 			Name:   "Gen Error - Remove this",
 			Method: "GET",
