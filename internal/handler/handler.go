@@ -186,10 +186,41 @@ func Login(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/landing", http.StatusSeeOther)
 }
 
+func redirectLoginPage(w http.ResponseWriter) {
+	templatePath := getTemplatePath("register-login.html")
+
+	t, err := template.ParseFiles(templatePath)
+	if err != nil {
+		log.Printf("error: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	type ErrorVariables struct {
+		Year         string
+		ErrorMessage string
+	}
+
+	w.WriteHeader(http.StatusUnauthorized)
+
+	err = t.Execute(w, nil)
+	if err != nil {
+		log.Printf("error: %v", err)
+		return
+	}
+}
+
 // RegisterFracc handles the rendering to register a fraccionamiento.
 // path: "/registrar-fraccionamiento"
 func RegisterFracc(w http.ResponseWriter, r *http.Request) {
+	// TODO:
 	// Verificar si el usuario no ha hecho login, si no mandar a hacer una cuenta.
+	loggedIn := isLoggedIn(r)
+	if !loggedIn {
+		redirectLoginPage(w)
+
+		return
+	}
 
 	pageVariables := PageVariables{
 		Year:    time.Now().Format("2006"),
