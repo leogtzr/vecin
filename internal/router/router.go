@@ -58,6 +58,14 @@ func createRoutes(dao *database.DAO, cfg *config.Config) *Routes {
 			},
 		},
 		Router{
+			Name:   "Registrar - Page",
+			Method: "GET",
+			Path:   "/registrar",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.Register(dao, w, r)
+			},
+		},
+		Router{
 			Name:   "View Fraccs",
 			Method: "GET",
 			Path:   "/view-fraccs",
