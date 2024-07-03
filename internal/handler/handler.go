@@ -1621,8 +1621,10 @@ func SignUp(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: save the user...
+	// TODO: use a service?
+
 	w.WriteHeader(http.StatusOK)
-	// TODO: fix this...
 	resp := map[string]string{
 		"message": "SignUp OK",
 		"id":      "1",

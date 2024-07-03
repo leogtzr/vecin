@@ -1,3 +1,12 @@
+CREATE TABLE usuario (
+    usuario_id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    telefono VARCHAR(15),
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE comunidad (
     comunidad_id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -12,22 +21,21 @@ CREATE TABLE comunidad (
     modelo_suscripcion VARCHAR(20) NOT NULL CHECK (modelo_suscripcion IN ('Mensual', 'Bimestral', 'Anual'))
 );
 
-CREATE TABLE registrante (
-     registrante_id SERIAL PRIMARY KEY,
-     nombre VARCHAR(100) NOT NULL,
-     apellido VARCHAR(100) NOT NULL,
-     telefono VARCHAR(15),
-     email VARCHAR(100) NOT NULL,
-     comunidad_id INT REFERENCES comunidad(comunidad_id)
+CREATE TABLE suscripcion (
+     suscripcion_id SERIAL PRIMARY KEY,
+     usuario_id INT REFERENCES usuario(usuario_id),
+     comunidad_id INT REFERENCES comunidad(comunidad_id),
+     modelo_suscripcion VARCHAR(20) NOT NULL CHECK (modelo_suscripcion IN ('Mensual', 'Bimestral', 'Anual')),
+     fecha_inicio DATE NOT NULL,
+     fecha_fin DATE NOT NULL,
+     monto DECIMAL(10, 2) NOT NULL
 );
 
-
-CREATE TABLE registro (
-    registro_id SERIAL PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    telefono VARCHAR(15),
-    correo VARCHAR(100),
-    comunidad_id INT REFERENCES comunidad(comunidad_id)
+CREATE TABLE pago (
+  pago_id SERIAL PRIMARY KEY,
+  suscripcion_id INT REFERENCES suscripcion(suscripcion_id),
+  fecha_pago DATE NOT NULL,
+  monto DECIMAL(10, 2) NOT NULL
 );
 
 CREATE TABLE casa (
@@ -108,29 +116,28 @@ CREATE TABLE anuncio_casa (
     descripcion TEXT
 );
 
+CREATE TABLE anuncio_comite (
+     anuncio_id SERIAL PRIMARY KEY,
+     comite_id INT REFERENCES comite(comite_id),
+     fecha DATE NOT NULL,
+     descripcion TEXT NOT NULL
+);
 
-
-
--- Insertar un nuevo fraccionamiento
-INSERT INTO comunidad (nombre, direccion_calle, direccion_numero, direccion_colonia, direccion_cp, direccion_ciudad, direccion_estado, direccion_pais, tipo, modelo_suscripcion)
-VALUES ('Calzada del Bosque', 'Av. Siempre Viva', '123', 'Los Pinos', '12345', 'Ciudad de México', 'CDMX', 'México', 'Fraccionamiento', 'Anual');
-
--- Obtener el ID del fraccionamiento recién insertado
-SELECT currval(pg_get_serial_sequence('comunidad','comunidad_id'));
-
--- Suponiendo que el ID del fraccionamiento es 1
--- Insertar información de quien registra el fraccionamiento
-INSERT INTO registro (nombre, telefono, correo, comunidad_id)
-VALUES ('Edgar Gutiérrez', '555-1234', 'edgar@example.com', 1);
-
--- Insertar casas y habitantes
-INSERT INTO casa (comunidad_id, direccion, numero) VALUES (1, 'Av. Siempre Viva 123', 1);
-INSERT INTO habitante (nombre, apellido, casa_id, telefono, email) VALUES ('Edgar', 'Gutiérrez', 1, '555-1234', 'edgar@example.com');
-INSERT INTO habitante (nombre, apellido, casa_id, telefono, email) VALUES ('Maria', 'Lopez', 1, '555-5678', 'maria@example.com');
-
--- Insertar comité y miembros del comité
-INSERT INTO comite (comunidad_id, nombre) VALUES (1, 'Comité de Seguridad');
--- Obtener el ID del comité recién insertado
-SELECT currval(pg_get_serial_sequence('comite','comite_id'));
--- Suponiendo que el ID del comité es 1
-INSERT INTO comite_miembro (comite_id, habitante_id) VALUES (1, 1); -- Edgar Gutiérrez es parte del comité
+-- Indexes:
+CREATE INDEX idx_usuario_email ON usuario(email);
+CREATE INDEX idx_comunidad_nombre ON comunidad(nombre);
+CREATE INDEX idx_suscripcion_usuario_id ON suscripcion(usuario_id);
+CREATE INDEX idx_suscripcion_comunidad_id ON suscripcion(comunidad_id);
+CREATE INDEX idx_casa_comunidad_id ON casa(comunidad_id);
+CREATE INDEX idx_departamento_comunidad_id ON departamento(comunidad_id);
+CREATE INDEX idx_habitante_casa_id ON habitante(casa_id);
+CREATE INDEX idx_habitante_departamento_id ON habitante(departamento_id);
+CREATE INDEX idx_comite_comunidad_id ON comite(comunidad_id);
+CREATE INDEX idx_comite_miembro_comite_id ON comite_miembro(comite_id);
+CREATE INDEX idx_comite_miembro_habitante_id ON comite_miembro(habitante_id);
+CREATE INDEX idx_junta_comunidad_id ON junta(comunidad_id);
+CREATE INDEX idx_anuncio_comunidad_id ON anuncio(comunidad_id);
+CREATE INDEX idx_anuncio_casa_casa_id ON anuncio_casa(casa_id);
+CREATE INDEX idx_anuncio_casa_departamento_id ON anuncio_casa(departamento_id);
+CREATE INDEX idx_bazar_casa_id ON bazar(casa_id);
+CREATE INDEX idx_bazar_departamento_id ON bazar(departamento_id);
