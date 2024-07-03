@@ -1,0 +1,57 @@
+-- Obtener la información de la comunidad "Calzada del Bosque":
+
+SELECT * FROM comunidad WHERE nombre = 'Calzada del Bosque';
+
+-- Obtener los detalles de la suscripción de Luis Patiño:
+
+SELECT s.* FROM suscripcion s
+JOIN usuario u ON s.usuario_id = u.usuario_id
+JOIN comunidad c ON s.comunidad_id = c.comunidad_id
+WHERE u.nombre = 'Luis' AND u.apellido = 'Patiño'
+AND c.nombre = 'Calzada del Bosque';
+
+-- Listar todos los habitantes de la casa 4414:
+
+SELECT h.* FROM habitante h
+JOIN casa c ON h.casa_id = c.casa_id
+JOIN comunidad com ON c.comunidad_id = com.comunidad_id
+WHERE c.numero = 4414 AND com.nombre = 'Calzada del Bosque';
+
+-- Listar todos los habitantes de la casa 4416:
+
+SELECT h.* FROM habitante h
+JOIN casa c ON h.casa_id = c.casa_id
+JOIN comunidad com ON c.comunidad_id = com.comunidad_id
+WHERE c.numero = 4416 AND com.nombre = 'Calzada del Bosque';
+
+-- Obtener el anuncio de la fiesta de Luis Patiño:
+
+SELECT * FROM anuncio
+WHERE comunidad_id = (SELECT comunidad_id FROM comunidad WHERE nombre = 'Calzada del Bosque')
+AND descripcion LIKE '%fiesta%'
+ORDER BY fecha DESC
+LIMIT 1;
+
+-- Listar los miembros del comité de "Calzada del Bosque":
+
+SELECT h.nombre, h.apellido FROM habitante h
+JOIN comite_miembro cm ON h.habitante_id = cm.habitante_id
+JOIN comite c ON cm.comite_id = c.comite_id
+JOIN comunidad com ON c.comunidad_id = com.comunidad_id
+WHERE com.nombre = 'Calzada del Bosque';
+
+-- Obtener los artículos en el bazar de Luis/Luisa Patiño:
+
+SELECT b.* FROM bazar b
+JOIN casa c ON b.casa_id = c.casa_id
+JOIN comunidad com ON c.comunidad_id = com.comunidad_id
+WHERE c.numero = 4416 AND com.nombre = 'Calzada del Bosque'
+AND b.fecha = '2024-10-22';
+
+-- Obtener el anuncio del comité sobre la reunión general:
+
+SELECT ac.* FROM anuncio_comite ac
+JOIN comite c ON ac.comite_id = c.comite_id
+JOIN comunidad com ON c.comunidad_id = com.comunidad_id
+WHERE com.nombre = 'Calzada del Bosque'
+AND ac.descripcion LIKE '%reunión general%';
