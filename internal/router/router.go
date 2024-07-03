@@ -91,7 +91,7 @@ func createRoutes(dao *database.DAO, cfg *config.Config) *Routes {
 		},
 		Router{
 			Name:   "Create Account - Page",
-			Method: "GET",
+			Method: "POST",
 			Path:   "/create-account",
 			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				handler.SignUp(dao, w, r)

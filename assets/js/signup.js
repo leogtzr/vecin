@@ -2,21 +2,16 @@ $(document).ready(function() {
     $('#signUp').on('submit', function(e) {
         e.preventDefault();
 
-        console.log('I am here...');
-
         var password = $('#password').val();
         var confirmPassword = $('#confirm_password').val();
 
         if (password !== confirmPassword) {
             $('#alert').fadeIn();
-            console.log('They do not match');
             setTimeout(function() {
                 $('#alert').fadeOut();
             }, 2000);
 
             return;
-        } else {
-            console.log('They do match :), all good');
         }
 
         var formData = {
@@ -24,11 +19,12 @@ $(document).ready(function() {
             apellido: $('#apellido').val(),
             telefono: $('#telefono').val(),
             email: $('#email').val(),
-            password: $('#password').val(),
-            confirm_password: $('#confirm_password').val(),
+            password: password,
+            confirmPassword: confirmPassword,
         };
 
-        console.log('Will try to send: ', formData);
+        console.log('Will try to send: ');
+        console.log(formData);
         $.ajax({
             url: '/registrar-fracc',
             type: 'POST',

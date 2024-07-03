@@ -1473,7 +1473,7 @@ func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	var formData model.RegisterFormData
+	var formData model.SignUpFormData
 	err := json.NewDecoder(r.Body).Decode(&formData)
 	if err != nil {
 		log.Printf("Error parsing form: %v", err)
@@ -1482,33 +1482,37 @@ func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	log.Printf("nombreComunidad = (%s)", formData.NombreComunidad)
-	log.Printf("tipoComunidad = (%s)", formData.TipoComunidad)
-	log.Printf("modeloSuscripcion = (%s)", formData.ModeloSuscripcion)
-	log.Printf("direccionCalle = (%s)", formData.DireccionCalle)
-	log.Printf("direccionNumero = (%s)", formData.DireccionNumero)
-	log.Printf("direccionColonia = (%s)", formData.DireccionColonia)
-	log.Printf("direccionCodigoPostal = (%s)", formData.DireccionCodigoPostal)
-	log.Printf("direccionCiudad = (%s)", formData.DireccionCiudad)
-	log.Printf("direccionEstado = (%s)", formData.DireccionEstado)
-	log.Printf("direccionPais = (%s)", formData.DireccionPais)
-	log.Printf("referencias = (%s)", formData.Referencias)
-	log.Printf("descripcion = (%s)", formData.Descripcion)
-	log.Printf("registranteNombre = (%s)", formData.RegistranteNombre)
-	log.Printf("registranteApellido = (%s)", formData.RegistranteApellido)
-	log.Printf("registranteTelefono = (%s)", formData.RegistranteTelefono)
-	log.Printf("registranteEmail = (%s)", formData.RegistranteEmail)
-	log.Printf("habitante = (%s)", formData.Habitante)
-	log.Printf("registranteSignUpUserName = (%s)", formData.RegistranteSignUpUserName)
-	log.Printf("registranteSignUpPassword = (%s)", formData.RegistranteSignUpPassword)
+	log.Printf("Form Data: %v", formData)
+
+	/*
+		log.Printf("nombreComunidad = (%s)", formData.NombreComunidad)
+		log.Printf("tipoComunidad = (%s)", formData.TipoComunidad)
+		log.Printf("modeloSuscripcion = (%s)", formData.ModeloSuscripcion)
+		log.Printf("direccionCalle = (%s)", formData.DireccionCalle)
+		log.Printf("direccionNumero = (%s)", formData.DireccionNumero)
+		log.Printf("direccionColonia = (%s)", formData.DireccionColonia)
+		log.Printf("direccionCodigoPostal = (%s)", formData.DireccionCodigoPostal)
+		log.Printf("direccionCiudad = (%s)", formData.DireccionCiudad)
+		log.Printf("direccionEstado = (%s)", formData.DireccionEstado)
+		log.Printf("direccionPais = (%s)", formData.DireccionPais)
+		log.Printf("referencias = (%s)", formData.Referencias)
+		log.Printf("descripcion = (%s)", formData.Descripcion)
+		log.Printf("registranteNombre = (%s)", formData.RegistranteNombre)
+		log.Printf("registranteApellido = (%s)", formData.RegistranteApellido)
+		log.Printf("registranteTelefono = (%s)", formData.RegistranteTelefono)
+		log.Printf("registranteEmail = (%s)", formData.RegistranteEmail)
+		log.Printf("habitante = (%s)", formData.Habitante)
+		log.Printf("registranteSignUpUserName = (%s)", formData.RegistranteSignUpUserName)
+		log.Printf("registranteSignUpPassword = (%s)", formData.RegistranteSignUpPassword)*/
 
 	// Save the data:
-	comunidadID, err := (*dao).SaveCommunity(formData)
+	//comunidadID, err := (*dao).SaveCommunity(formData)
+	// TODO: fix this...
 
 	w.WriteHeader(http.StatusOK)
 	resp := map[string]string{
 		"message":           "RegisterPage OK",
-		"fraccionamientoID": fmt.Sprintf("%d", comunidadID),
+		"fraccionamientoID": fmt.Sprintf("%d", "1"),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -1621,8 +1625,16 @@ func SignUp(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: save the user...
-	// TODO: use a service?
+	var formData model.SignUpFormData
+	err := json.NewDecoder(r.Body).Decode(&formData)
+	if err != nil {
+		log.Printf("Error parsing form: %v", err)
+		redirectToErrorPageWithMessageAndStatusCode(w, "Unable to process input data", http.StatusInternalServerError)
+
+		return
+	}
+
+	log.Printf("Form Data: %v", formData)
 
 	w.WriteHeader(http.StatusOK)
 	resp := map[string]string{
