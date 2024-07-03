@@ -62,7 +62,7 @@ func createRoutes(dao *database.DAO, cfg *config.Config) *Routes {
 			Method: "GET",
 			Path:   "/registrar",
 			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
-				handler.Register(dao, w, r)
+				handler.RegisterPage(dao, w, r)
 			},
 		},
 		Router{
@@ -70,7 +70,7 @@ func createRoutes(dao *database.DAO, cfg *config.Config) *Routes {
 			Method: "GET",
 			Path:   "/view-fraccs",
 			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
-				handler.ViewFraccs(dao, w, r)
+				handler.ViewFraccsPage(dao, w, r)
 			},
 		},
 		Router{
@@ -81,13 +81,20 @@ func createRoutes(dao *database.DAO, cfg *config.Config) *Routes {
 				handler.Login(dao, w, r)
 			},
 		},
-		// /create-account
 		Router{
 			Name:   "Create Account - Page",
 			Method: "GET",
 			Path:   "/create-account",
 			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
-				handler.CreateAccount(dao, w, r)
+				handler.CreateAccountPage(dao, w, r)
+			},
+		},
+		Router{
+			Name:   "Create Account - Page",
+			Method: "GET",
+			Path:   "/create-account",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.SignUp(dao, w, r)
 			},
 		},
 		Router{

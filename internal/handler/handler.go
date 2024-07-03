@@ -1507,7 +1507,7 @@ func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request
 
 	w.WriteHeader(http.StatusOK)
 	resp := map[string]string{
-		"message":           "Register OK",
+		"message":           "RegisterPage OK",
 		"fraccionamientoID": fmt.Sprintf("%d", comunidadID),
 	}
 
@@ -1519,7 +1519,7 @@ func GenError(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	redirectToErrorPageWithMessageAndStatusCode(w, "error: just testing...", http.StatusInternalServerError)
 }
 
-func ViewFraccs(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
+func ViewFraccsPage(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 
 	pageVariables := PageVariables{
@@ -1544,7 +1544,7 @@ func ViewFraccs(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func Register(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
+func RegisterPage(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	//now := time.Now()
 	//
 	//pageVariables := PageVariables{
@@ -1591,7 +1591,7 @@ func Register(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CreateAccount(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
+func CreateAccountPage(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	templatePath := getTemplatePath("create-account.html")
 
 	t, err := template.ParseFiles(templatePath)
@@ -1613,4 +1613,21 @@ func CreateAccount(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 		log.Printf("error: %v", err)
 		return
 	}
+}
+
+func SignUp(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	// TODO: fix this...
+	resp := map[string]string{
+		"message": "SignUp OK",
+		"id":      "1",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(resp)
 }
