@@ -3,6 +3,7 @@ package model
 import "fmt"
 
 type SignUpFormData struct {
+	Username        string `json:"username"`
 	Nombre          string `json:"nombre"`
 	Apellido        string `json:"apellido"`
 	Telefono        string `json:"telefono"`
@@ -12,15 +13,6 @@ type SignUpFormData struct {
 }
 
 func (s SignUpFormData) String() string {
-	return fmt.Sprintf("Nombre: (%s), Apellido: (%s), Telefono: (%s), Email: (%s), Password: (%s), ConfirmPassword: (%s)",
-		s.Nombre, s.Apellido, s.Telefono, s.Email, s.Password, s.ConfirmPassword)
+	return fmt.Sprintf("Nombre: (%s), Username: (%s), Apellido: (%s), Telefono: (%s), Email: (%s), Password: (%s), ConfirmPassword: (%s)",
+		s.Nombre, s.Username, s.Apellido, s.Telefono, s.Email, s.Password, s.ConfirmPassword)
 }
-
-/*
-nombre: $('#nombre').val(),
-apellido: $('#apellido').val(),
-telefono: $('#telefono').val(),
-email: $('#email').val(),
-password: $('#password').val(),
-confirm_password: $('#confirm_password').val(),
-*/

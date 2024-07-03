@@ -15,6 +15,7 @@ $(document).ready(function() {
         }
 
         var formData = {
+            username: $('#username').val(),
             nombre: $('#nombre').val(),
             apellido: $('#apellido').val(),
             telefono: $('#telefono').val(),
@@ -26,7 +27,7 @@ $(document).ready(function() {
         console.log('Will try to send: ');
         console.log(formData);
         $.ajax({
-            url: '/registrar-fracc',
+            url: '/create-account',
             type: 'POST',
             data: JSON.stringify(formData),
             contentType: 'application/json',
@@ -35,12 +36,20 @@ $(document).ready(function() {
                 console.log(response);
 
                 // Redirigir a otra página después del registro exitoso
+                // TODO: fix this...
                 window.location.href = '/some-other-page';
 
             },
             error: function(xhr, status, error) {
-                console.error('Error:', error);
-                $('#alert').text('Error en el registro: ' + error).fadeIn();
+                let errorMessage = 'Unknown error';
+                try {
+                    const responseJSON = JSON.parse(xhr.responseText);
+                    errorMessage = responseJSON.message || errorMessage;
+                } catch (e) {
+                    console.error('Error parsing JSON:', e);
+                }
+
+                $('#alert').text('Error en el registro: ' + errorMessage).fadeIn();
                 setTimeout(function() {
                     $('#alert').fadeOut();
                 }, 2000);

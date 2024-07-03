@@ -38,41 +38,6 @@ type PageVariables struct {
 	AppName      string
 }
 
-// type PageVariablesForAuthors struct {
-// 	Year         string
-// 	SiteKey      string
-// 	Authors      []string
-// 	LoggedIn     bool
-// 	UseAnalytics bool
-// }
-
-// type PageResultsVariablesForWishList struct {
-// 	Year         string
-// 	SiteKey      string
-// 	Results      []book.WishListBook
-// 	LoggedIn     bool
-// 	IsAdmin      bool
-// 	UseAnalytics bool
-// }
-
-// type PageResultsVariables struct {
-// 	Year         string
-// 	SiteKey      string
-// 	Results      []book.BookInfo
-// 	LoggedIn     bool
-// 	IsAdmin      bool
-// 	Funcs        template.FuncMap
-// 	Page         int
-// 	TotalPages   int
-// 	CurrentPage  int
-// 	PreviousPage int
-// 	NextPage     int
-// 	StartPage    int
-// 	EndPage      int
-// 	Pages        []int
-// 	UseAnalytics bool
-// }
-
 func generateRandomString(length int) string {
 	b := make([]byte, length)
 	_, err := rand.Read(b)
@@ -264,32 +229,6 @@ func RegisterFracc(w http.ResponseWriter, r *http.Request) {
 // 	return email, nil
 // }
 
-// func parseBookSearchType(input string) book.BookSearchType {
-// 	switch strings.TrimSpace(strings.ToLower(input)) {
-// 	case "bytitle":
-// 		return book.ByTitle
-// 	case "byauthor":
-// 		return book.ByAuthor
-// 	default:
-// 		return book.Unknown
-// 	}
-// }
-
-// func getDevUserInfo() (*user.UserInfo, error) {
-// 	if !isDevMode() {
-// 		return nil, fmt.Errorf("no dev mode")
-// 	}
-
-// 	var userInfo user.UserInfo
-// 	userInfo.Nickname = "Leo"
-// 	userInfo.Name = "Leo"
-// 	userInfo.Email = os.Getenv("LEONLIB_MAINAPP_USER")
-// 	userInfo.Sub = "leonardo"
-// 	userInfo.Verified = true
-
-// 	return &userInfo, nil
-// }
-
 // func getUserInfoFromAuth0(accessToken string) (*user.UserInfo, error) {
 // 	userInfoEndpoint := fmt.Sprintf("https://%s/userinfo", os.Getenv("AUTH0_DOMAIN"))
 
@@ -394,18 +333,9 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	})
 // }
 
-// func writeErrorLikeStatus(w http.ResponseWriter, err error) {
-// 	log.Printf("Error parsing template: %v", err)
-
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(map[string]string{
-// 		"status": "error",
-// 	})
-// }
-
 // func writeUnauthenticated(w http.ResponseWriter) {
 // 	w.Header().Set("Content-Type", "application/json")
-
+// Note: might be a good idea to add the status code to the header (404? 200? 401? 402? 5XX?)
 // 	json.NewEncoder(w).Encode(map[string]string{"status": "unauthenticated"})
 // }
 
@@ -430,42 +360,6 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	fmt.Println("----- end")
 
 // 	return userID, nil
-// }
-
-// func getAllAuthors(db *sql.DB) ([]string, error) {
-// 	var err error
-
-// 	allAuthorsRows, err := db.Query("SELECT DISTINCT author FROM books ORDER BY author")
-// 	if err != nil {
-// 		return []string{}, err
-// 	}
-
-// 	defer allAuthorsRows.Close()
-
-// 	var authors []string
-// 	for allAuthorsRows.Next() {
-// 		var author string
-// 		if err := allAuthorsRows.Scan(&author); err != nil {
-// 			return []string{}, err
-// 		}
-// 		authors = append(authors, author)
-// 	}
-
-// 	return authors, nil
-// }
-
-// func uniqueSearchTypes(searchTypes []string) []string {
-// 	set := make(map[string]struct{})
-// 	var result []string
-
-// 	for _, item := range searchTypes {
-// 		if _, exists := set[item]; !exists {
-// 			set[item] = struct{}{}
-// 			result = append(result, item)
-// 		}
-// 	}
-
-// 	return result
 // }
 
 // func BooksByAuthorPage(database *database.DAO, w http.ResponseWriter, r *http.Request) {
@@ -510,68 +404,6 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	}
 // }
 
-// func getBooksWithPagination(db *sql.DB, offset, limit int) ([]book.BookInfo, error) {
-// 	query := `SELECT id, title, author, description, read, added_on FROM books ORDER BY title LIMIT $1 OFFSET $2;`
-
-// 	fmt.Printf("query=(%s)\n", query)
-
-// 	rows, err := db.Query(query, limit, offset)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	defer rows.Close()
-
-// 	books := []book.BookInfo{}
-// 	for rows.Next() {
-// 		book := book.BookInfo{}
-// 		err = rows.Scan(&book.ID, &book.Title, &book.Author, &book.Description, &book.HasBeenRead, &book.AddedOn)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		books = append(books, book)
-// 	}
-
-// 	return books, nil
-// }
-
-// func setUpPaginationFor(pageInt int, database *database.DAO, pageVariables *PageResultsVariables) error {
-// 	now := time.Now()
-
-// 	pageVariables.Year = now.Format("2006")
-// 	pageVariables.SiteKey = captcha.SiteKey
-
-// 	totalBooks, err := (*database).GetBookCount()
-// 	if err != nil {
-// 		log.Printf("Error getting total books: %v", err)
-// 		return err
-// 	}
-
-// 	totalPages := int(math.Ceil(float64(totalBooks) / float64(numberOfResultsByPage)))
-// 	pageVariables.TotalPages = totalPages
-// 	pageVariables.PreviousPage = pageInt - 1
-// 	pageVariables.CurrentPage = pageInt
-// 	pageVariables.NextPage = pageInt + 1
-// 	pageVariables.LoggedIn = false
-// 	pageVariables.StartPage = 1
-// 	pageVariables.EndPage = totalPages
-
-// 	start := 1
-// 	end := totalPages
-
-// 	if totalPages > 5 {
-// 		if pageInt > 3 {
-// 			start = pageInt - 2
-// 			end = pageInt + 2
-// 			if end > totalPages {
-// 				end = totalPages
-// 				start = end - 4
-// 			}
-// 		} else {
-// 			end = 5
-// 		}
-// 	}
-
 // 	var pages []int
 // 	for i := start; i <= end; i++ {
 // 		pages = append(pages, i)
@@ -584,28 +416,6 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 
 // 	return nil
 // }
-
-// func AllBooksPage(database *database.DAO, w http.ResponseWriter, r *http.Request) {
-// 	page := r.URL.Query().Get("page")
-// 	if page == "" {
-// 		page = "1"
-// 	}
-
-// 	pageInt, err := strconv.Atoi(page)
-// 	if err != nil {
-// 		log.Printf("Error converting page to int: %v", err)
-// 		redirectToErrorPageWithMessageAndStatusCode(w, "error getting information from the database", http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	offset := (pageInt - 1) * numberOfResultsByPage
-
-// 	books, err := (*database).GetBooksWithPagination(offset, numberOfResultsByPage)
-// 	if err != nil {
-// 		log.Printf("Error getting books: %v", err)
-// 		redirectToErrorPageWithMessageAndStatusCode(w, "error getting information from the database", http.StatusInternalServerError)
-// 		return
-// 	}
 
 // 	pageVariables := PageResultsVariables{}
 // 	pageVariables.UseAnalytics = useAnalytics
@@ -1625,8 +1435,8 @@ func SignUp(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var formData model.SignUpFormData
-	err := json.NewDecoder(r.Body).Decode(&formData)
+	var signUpFormData model.SignUpFormData
+	err := json.NewDecoder(r.Body).Decode(&signUpFormData)
 	if err != nil {
 		log.Printf("Error parsing form: %v", err)
 		redirectToErrorPageWithMessageAndStatusCode(w, "Unable to process input data", http.StatusInternalServerError)
@@ -1634,7 +1444,16 @@ func SignUp(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Form Data: %v", formData)
+	log.Printf("Form Data: %v", signUpFormData)
+
+	if signUpFormData.Password != signUpFormData.ConfirmPassword {
+		// TODO: put this in a function
+		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]string{"message": "passwords do not match"})
+
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	resp := map[string]string{
