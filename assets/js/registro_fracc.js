@@ -55,7 +55,6 @@ $(document).ready(function() {
         $('#registroComunidadForm').on('submit', function(e) {
             e.preventDefault();
 
-            var formData = new FormData(this);
             const clickedElement = $(this);
 
             var formData = {
@@ -71,17 +70,11 @@ $(document).ready(function() {
                 direccionPais: $('#direccionPais').val(),
                 referencias: $('#referencias').val(),
                 descripcion: $('#descripcion').val(),
-                registranteNombre: $('#registranteNombre').val(),
-                registranteApellido: $('#registranteApellido').val(),
-                registranteTelefono: $('#registranteTelefono').val(),
-                registranteUsername: $('#registranteUsername').val(),
-                registranteEmail: $('#registranteEmail').val(),
-                habitante: $('#habitante').val(),
-                registranteSignUpUserName: $('#registranteSignUpUserName').val(),
-                registranteSignUpPassword: $('#registranteSignUpPassword').val()
             };
 
-            console.log('Will try to send: ', formData);
+            console.log('Will try to send: ');
+            console.log(formData);
+
             $.ajax({
                 url: '/registrar-fracc',
                 type: 'POST',

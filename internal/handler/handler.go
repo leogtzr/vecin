@@ -64,7 +64,7 @@ func addTemplateFiles(additionalFiles ...string) []string {
 
 // ToDo: finish this...
 func isLoggedIn(r *http.Request) bool {
-	return false
+	return !false
 }
 
 // IndexPage renders the home or index page.
