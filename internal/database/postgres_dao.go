@@ -77,9 +77,11 @@ func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
 	return &user, nil
 }
 
+// SaveCommunity saves a comunity into the database.
 func (dao *daoImpl) SaveCommunity(data model.RegisterFormData) (int, error) {
 	var comunidadID int
 	var err error
+
 	err = dao.db.QueryRow(`
         INSERT INTO comunidad (nombre, direccion_calle, direccion_numero, direccion_colonia, direccion_cp, direccion_ciudad, direccion_estado, direccion_pais, tipo, modelo_suscripcion)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING comunidad_id
@@ -100,29 +102,85 @@ func (dao *daoImpl) SaveCommunity(data model.RegisterFormData) (int, error) {
 
 	log.Printf("debug:x done saving to comunidad, id=%d", comunidadID)
 
-	_, err = dao.db.Exec(`
-        INSERT INTO registro (nombre, telefono, correo, comunidad_id) VALUES ($1, $2, $3, $4)
-    `, data.RegistranteNombre+" "+data.RegistranteApellido, data.RegistranteTelefono, data.RegistranteEmail, comunidadID)
+	return comunidadID, nil
+}
+
+/*
+func (dao *daoImpl) SaveCommunity(data model.RegisterFormData) (int, error) {
+	var comunidadID int
+	var suscripcionID int
+	var pagoID int
+
+	tx, err := dao.db.Begin()
 	if err != nil {
 		return -1, err
 	}
 
-	log.Printf("debug:x done saving to registro")
-
-	// Si es habitante, insertar en la tabla habitante
-	if data.Habitante == "yes" {
-		_, err = dao.db.Exec(`
-            INSERT INTO habitante (nombre, apellido, telefono, email) VALUES ($1, $2, $3, $4)`,
-			data.RegistranteNombre, data.RegistranteApellido, data.RegistranteTelefono, data.RegistranteEmail)
-		if err != nil {
-			return -1, err
-		}
+	// Insertar en la tabla comunidad
+	err = tx.QueryRow(`
+        INSERT INTO comunidad (nombre, direccion_calle, direccion_numero, direccion_colonia, direccion_cp, direccion_ciudad, direccion_estado, direccion_pais, tipo, modelo_suscripcion)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING comunidad_id
+    `,
+		data.NombreComunidad,
+		data.DireccionCalle,
+		data.DireccionNumero,
+		data.DireccionColonia,
+		data.DireccionCodigoPostal,
+		data.DireccionCiudad,
+		data.DireccionEstado,
+		data.DireccionPais,
+		data.TipoComunidad,
+		data.ModeloSuscripcion).Scan(&comunidadID)
+	if err != nil {
+		tx.Rollback()
+		return -1, err
 	}
 
-	log.Printf("debug:x done saving to habitante, DONE")
+	log.Printf("debug:x done saving to comunidad, id=%d", comunidadID)
+
+	// Insertar en la tabla suscripcion
+	err = tx.QueryRow(`
+        INSERT INTO suscripcion (usuario_id, comunidad_id, modelo_suscripcion, fecha_inicio, fecha_fin, monto)
+        VALUES ($1, $2, $3, $4, $5, $6) RETURNING suscripcion_id
+    `,
+		data.UsuarioID, // Debes asegurarte de tener UsuarioID en el data
+		comunidadID,
+		data.ModeloSuscripcion,
+		data.FechaInicioSuscripcion, // Asegúrate de tener estos campos en el data
+		data.FechaFinSuscripcion,
+		data.MontoSuscripcion).Scan(&suscripcionID)
+	if err != nil {
+		tx.Rollback()
+		return -1, err
+	}
+
+	log.Printf("debug:x done saving to suscripcion, id=%d", suscripcionID)
+
+	// Insertar en la tabla pago
+	err = tx.QueryRow(`
+        INSERT INTO pago (suscripcion_id, fecha_pago, monto)
+        VALUES ($1, $2, $3) RETURNING pago_id
+    `,
+		suscripcionID,
+		data.FechaPago, // Asegúrate de tener estos campos en el data
+		data.MontoPago).Scan(&pagoID)
+	if err != nil {
+		tx.Rollback()
+		return -1, err
+	}
+
+	log.Printf("debug:x done saving to pago, id=%d", pagoID)
+
+	// Confirmar la transacción
+	err = tx.Commit()
+	if err != nil {
+		return -1, err
+	}
 
 	return comunidadID, nil
 }
+
+*/
 
 // func (database *postgresBookDAO) CreateBook(book book.BookInfo) error {
 // 	stmt, err := database.db.Prepare("INSERT INTO books (title, author, description, read, goodreads_link) VALUES ($1, $2, $3, $4, $5)")

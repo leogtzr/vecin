@@ -64,7 +64,7 @@ func addTemplateFiles(additionalFiles ...string) []string {
 
 // ToDo: finish this...
 func isLoggedIn(r *http.Request) bool {
-	return !false
+	return false
 }
 
 // IndexPage renders the home or index page.
@@ -161,14 +161,15 @@ func redirectLoginPage(w http.ResponseWriter) {
 		return
 	}
 
-	type ErrorVariables struct {
-		Year         string
-		ErrorMessage string
-	}
-
 	w.WriteHeader(http.StatusUnauthorized)
 
-	err = t.Execute(w, nil)
+	pageVariables := PageVariables{
+		Year:     time.Now().Format("2006"),
+		AppName:  "Vecin",
+		LoggedIn: false,
+	}
+
+	err = t.Execute(w, pageVariables)
 	if err != nil {
 		log.Printf("error: %v", err)
 		return
@@ -1283,7 +1284,7 @@ func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	var formData model.SignUpFormData
+	var formData model.RegisterFormData
 	err := json.NewDecoder(r.Body).Decode(&formData)
 	if err != nil {
 		log.Printf("Error parsing form: %v", err)
@@ -1294,35 +1295,14 @@ func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request
 
 	log.Printf("Form Data: %v", formData)
 
-	/*
-		log.Printf("nombreComunidad = (%s)", formData.NombreComunidad)
-		log.Printf("tipoComunidad = (%s)", formData.TipoComunidad)
-		log.Printf("modeloSuscripcion = (%s)", formData.ModeloSuscripcion)
-		log.Printf("direccionCalle = (%s)", formData.DireccionCalle)
-		log.Printf("direccionNumero = (%s)", formData.DireccionNumero)
-		log.Printf("direccionColonia = (%s)", formData.DireccionColonia)
-		log.Printf("direccionCodigoPostal = (%s)", formData.DireccionCodigoPostal)
-		log.Printf("direccionCiudad = (%s)", formData.DireccionCiudad)
-		log.Printf("direccionEstado = (%s)", formData.DireccionEstado)
-		log.Printf("direccionPais = (%s)", formData.DireccionPais)
-		log.Printf("referencias = (%s)", formData.Referencias)
-		log.Printf("descripcion = (%s)", formData.Descripcion)
-		log.Printf("registranteNombre = (%s)", formData.RegistranteNombre)
-		log.Printf("registranteApellido = (%s)", formData.RegistranteApellido)
-		log.Printf("registranteTelefono = (%s)", formData.RegistranteTelefono)
-		log.Printf("registranteEmail = (%s)", formData.RegistranteEmail)
-		log.Printf("habitante = (%s)", formData.Habitante)
-		log.Printf("registranteSignUpUserName = (%s)", formData.RegistranteSignUpUserName)
-		log.Printf("registranteSignUpPassword = (%s)", formData.RegistranteSignUpPassword)*/
-
 	// Save the data:
-	//comunidadID, err := (*dao).SaveCommunity(formData)
+	comunidadID, err := (*dao).SaveCommunity(formData)
 	// TODO: fix this...
 
 	w.WriteHeader(http.StatusOK)
 	resp := map[string]string{
 		"message":           "RegisterPage OK",
-		"fraccionamientoID": fmt.Sprintf("%d", "1"),
+		"fraccionamientoID": fmt.Sprintf("%d", comunidadID),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
