@@ -105,6 +105,14 @@ func (dao *daoImpl) SaveCommunity(data model.RegisterFormData) (int, error) {
 	return comunidadID, nil
 }
 
+func (dao *daoImpl) SaveUser(data model.SignUpFormData) (int, error) {
+	return -1, nil
+}
+
+func (dao *daoImpl) DB() *sql.DB {
+	return dao.db
+}
+
 /*
 func (dao *daoImpl) SaveCommunity(data model.RegisterFormData) (int, error) {
 	var comunidadID int

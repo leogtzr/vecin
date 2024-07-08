@@ -6,6 +6,7 @@ import (
 	"vecin/internal/database"
 	"vecin/internal/handler"
 	"vecin/internal/middleware"
+	"vecin/internal/service"
 
 	"golang.org/x/time/rate"
 
@@ -21,7 +22,7 @@ type Router struct {
 
 type Routes []Router
 
-func createRoutes(dao *database.DAO, cfg *config.Config) *Routes {
+func createRoutes(svc *service.Service, dao *database.DAO, cfg *config.Config) *Routes {
 	routes := &Routes{
 		Router{
 			Name:        "IndexPage",
@@ -94,7 +95,7 @@ func createRoutes(dao *database.DAO, cfg *config.Config) *Routes {
 			Method: "POST",
 			Path:   "/create-account",
 			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
-				handler.SignUp(dao, w, r)
+				handler.SignUp(svc, w, r)
 			},
 		},
 		Router{
@@ -111,7 +112,8 @@ func createRoutes(dao *database.DAO, cfg *config.Config) *Routes {
 }
 
 func NewRouter(dao *database.DAO, limiter *rate.Limiter, cfg *config.Config) *mux.Router {
-	routes := createRoutes(dao, cfg)
+	svc := service.NewService(*dao, cfg)
+	routes := createRoutes(svc, dao, cfg)
 	router := mux.NewRouter().StrictSlash(true)
 
 	nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

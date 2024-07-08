@@ -17,6 +17,7 @@ import (
 	"vecin/internal/database"
 	"vecin/internal/middleware"
 	"vecin/internal/model"
+	"vecin/internal/service"
 )
 
 var templateHTMLFiles = []string{
@@ -1409,7 +1410,7 @@ func CreateAccountPage(dao *database.DAO, w http.ResponseWriter, r *http.Request
 	}
 }
 
-func SignUp(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
+func SignUp(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
@@ -1427,14 +1428,37 @@ func SignUp(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	log.Printf("Form Data: %v", signUpFormData)
 
 	if signUpFormData.Password != signUpFormData.ConfirmPassword {
-		// TODO: put this in a function
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(map[string]string{"message": "passwords do not match"})
+		writePasswordDoNotMatchToResponse(w)
 
 		return
 	}
 
+	// TODO: guardar el usuario a la DB
+	// TODO: lanzar el mecanismo de confirmación de cuenta por medio de verificación de correo electrónico
+	// TODO: Service se hará cargo de todo esto.
+
+	token, err := svc.GenerateToken()
+	if err != nil {
+		log.Printf("Error generating token: %v", err)
+		redirectToErrorPageWithMessageAndStatusCode(w, "Unable to generate confirmation token", http.StatusInternalServerError)
+		return
+	}
+
+	err = svc.SaveUser(signUpFormData, token)
+	if err != nil {
+		log.Printf("Error saving user: %v", err)
+		redirectToErrorPageWithMessageAndStatusCode(w, "Unable to save user", http.StatusInternalServerError)
+		return
+	}
+
+	err = svc.SendConfirmationEmail(signUpFormData.Username, signUpFormData.Email, token)
+	if err != nil {
+		log.Printf("Error sending confirmation email: %v", err)
+		redirectToErrorPageWithMessageAndStatusCode(w, "Unable to send confirmation email", http.StatusInternalServerError)
+		return
+	}
+
+	// TODO: do something useful with this information...
 	w.WriteHeader(http.StatusOK)
 	resp := map[string]string{
 		"message": "SignUp OK",
@@ -1443,4 +1467,10 @@ func SignUp(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(resp)
+}
+
+func writePasswordDoNotMatchToResponse(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusBadRequest)
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(map[string]string{"message": "passwords do not match"})
 }

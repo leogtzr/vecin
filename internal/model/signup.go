@@ -1,6 +1,9 @@
 package model
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type SignUpFormData struct {
 	Username        string `json:"username"`
@@ -11,6 +14,14 @@ type SignUpFormData struct {
 	Password        string `json:"password"`
 	ConfirmPassword string `json:"confirmPassword"`
 	PaymentOption   string `json:"paymentOption"`
+}
+
+// Al momento de guardar un usuario, necesitaremos un objeto con la información que hemos
+// recibido del formulario desde el Front-end, también necesitaremos el Token generado
+type SignUpUserConfig struct {
+	SignUpFormData SignUpFormData
+	Token          string
+	ExpiryTime     time.Time
 }
 
 func (s SignUpFormData) String() string {

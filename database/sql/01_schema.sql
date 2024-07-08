@@ -125,6 +125,14 @@ CREATE TABLE anuncio_comite (
      descripcion TEXT NOT NULL
 );
 
+CREATE TABLE confirmacion_cuenta (
+     confirmacion_id SERIAL PRIMARY KEY,
+     usuario_id INT REFERENCES usuario(usuario_id) ON DELETE CASCADE,
+     token VARCHAR(255) NOT NULL UNIQUE,
+     fecha_expiracion TIMESTAMP NOT NULL
+);
+
+
 -- Indexes:
 CREATE INDEX idx_usuario_email ON usuario(email);
 CREATE INDEX idx_comunidad_nombre ON comunidad(nombre);
@@ -143,3 +151,4 @@ CREATE INDEX idx_anuncio_casa_casa_id ON anuncio_casa(casa_id);
 CREATE INDEX idx_anuncio_casa_departamento_id ON anuncio_casa(departamento_id);
 CREATE INDEX idx_bazar_casa_id ON bazar(casa_id);
 CREATE INDEX idx_bazar_departamento_id ON bazar(departamento_id);
+CREATE INDEX idx_confirmacion_token ON confirmacion_cuenta(token);
