@@ -5,7 +5,8 @@ CREATE TABLE usuario (
     apellido VARCHAR(100) NOT NULL,
     telefono VARCHAR(15),
     email VARCHAR(100) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL
+    password_hash VARCHAR(255) NOT NULL,
+    activo BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE comunidad (

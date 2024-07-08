@@ -22,6 +22,7 @@ $(document).ready(function() {
             email: $('#email').val(),
             password: password,
             confirmPassword: confirmPassword,
+            paymentOption: $('input[name="payment_option"]:checked').val()
         };
 
         console.log('Will try to send: ');
