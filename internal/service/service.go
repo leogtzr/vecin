@@ -34,7 +34,7 @@ func (s *Service) CalculateExpiry(duration time.Duration) time.Time {
 }
 
 func (s *Service) SendConfirmationEmail(username, email, token string) error {
-	// TODO: use configuration or a similarway to build the URL for confirmation...
+	// TODO: use configuration or a similar way to build the URL for confirmation...
 	confirmationLink := fmt.Sprintf("https://tu-sitio.com/confirmar-cuenta/%s", token)
 	body := fmt.Sprintf(`
 Hola %s,
@@ -48,6 +48,8 @@ Si no te registraste en Vecin, ignora este correo.
 Saludos,
 El equipo de Vecin
 `, username, confirmationLink)
+
+	// TODO: delegate this to the email sender object
 
 	from := "tu-email@example.com"
 	password := "tu-contraseña"

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"time"
 )
@@ -17,6 +18,7 @@ type Config struct {
 	HTTPPort            string
 	UserTokenLen        int
 	UserTokenExpiryDays time.Duration
+	MailSenderApiKey    string
 }
 
 func getEnv(key, defaultValue string) string {
@@ -26,7 +28,7 @@ func getEnv(key, defaultValue string) string {
 	return defaultValue
 }
 
-func NewConfig() *Config {
+func NewConfig() (*Config, error) {
 	config := &Config{
 		DBMode:              getEnv("DB_MODE", "postgres"),
 		DBHost:              getEnv("PGHOST", "localhost"),
@@ -39,7 +41,12 @@ func NewConfig() *Config {
 		HTTPPort:            getEnv("PORT", "8180"),
 		UserTokenLen:        16, // 32 characters length (hex)
 		UserTokenExpiryDays: 30 * 24 * time.Hour,
+		MailSenderApiKey:    getEnv("MAILSENDER_API_KEY", ""),
 	}
 
-	return config
+	if config.MailSenderApiKey == "" {
+		return nil, fmt.Errorf("mail sender api key not set")
+	}
+
+	return config, nil
 }
