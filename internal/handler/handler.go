@@ -1454,6 +1454,7 @@ func SignUp(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	err = svc.SendConfirmationEmail(signUpFormData.Username, signUpFormData.Email, token)
 	if err != nil {
 		log.Printf("Error sending confirmation email: %v", err)
+
 		redirectToErrorPageWithMessageAndStatusCode(w, "Unable to send confirmation email", http.StatusInternalServerError)
 		return
 	}

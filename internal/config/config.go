@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type Mailing struct {
+	ApiKey           string
+	ConfirmationLink string
+}
+
 type Config struct {
 	DBMode              string
 	DBHost              string
@@ -19,6 +24,8 @@ type Config struct {
 	UserTokenLen        int
 	UserTokenExpiryDays time.Duration
 	MailSenderApiKey    string
+
+	Mailing Mailing
 }
 
 func getEnv(key, defaultValue string) string {
@@ -42,9 +49,17 @@ func NewConfig() (*Config, error) {
 		UserTokenLen:        16, // 32 characters length (hex)
 		UserTokenExpiryDays: 30 * 24 * time.Hour,
 		MailSenderApiKey:    getEnv("MAILSENDER_API_KEY", ""),
+		Mailing: Mailing{
+			ApiKey:           getEnv("MAILSENDER_API_KEY", ""),
+			ConfirmationLink: getEnv("EMAIL_ACCOUNT_CONFIRMATION_LINK", ""),
+		},
 	}
 
 	if config.MailSenderApiKey == "" {
+		return nil, fmt.Errorf("mail sender api key not set")
+	}
+
+	if config.Mailing.ApiKey == "" {
 		return nil, fmt.Errorf("mail sender api key not set")
 	}
 

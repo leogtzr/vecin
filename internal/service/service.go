@@ -5,20 +5,21 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
-	"net/smtp"
 	"time"
 	"vecin/internal/config"
 	"vecin/internal/database"
+	"vecin/internal/email"
 	"vecin/internal/model"
 )
 
 type Service struct {
-	dao    database.DAO
-	Config *config.Config
+	dao         database.DAO
+	Config      *config.Config
+	EmailSender email.EmailSender
 }
 
-func NewService(dao database.DAO, cfg *config.Config) *Service {
-	return &Service{dao: dao, Config: cfg}
+func NewService(dao database.DAO, cfg *config.Config, emailSender email.EmailSender) *Service {
+	return &Service{dao: dao, Config: cfg, EmailSender: emailSender}
 }
 
 func (s *Service) GenerateToken() (string, error) {
@@ -35,42 +36,44 @@ func (s *Service) CalculateExpiry(duration time.Duration) time.Time {
 
 func (s *Service) SendConfirmationEmail(username, email, token string) error {
 	// TODO: use configuration or a similar way to build the URL for confirmation...
-	confirmationLink := fmt.Sprintf("https://tu-sitio.com/confirmar-cuenta/%s", token)
-	body := fmt.Sprintf(`
-Hola %s,
+	/*
+			confirmationLink := fmt.Sprintf("https://tu-sitio.com/confirmar-cuenta/%s", token)
+			body := fmt.Sprintf(`
+		Hola %s,
 
-Gracias por registrarte en Vecin. Por favor, haz clic en el siguiente enlace para confirmar tu cuenta:
+		Gracias por registrarte en Vecin. Por favor, haz clic en el siguiente enlace para confirmar tu cuenta:
 
-%s
+		%s
 
-Si no te registraste en Vecin, ignora este correo.
+		Si no te registraste en Vecin, ignora este correo.
 
-Saludos,
-El equipo de Vecin
-`, username, confirmationLink)
+		Saludos,
+		El equipo de Vecin
+		`, username, confirmationLink)
 
-	// TODO: delegate this to the email sender object
+			// TODO: delegate this to the email sender object
 
-	from := "tu-email@example.com"
-	password := "tu-contraseña"
-	to := email
-	smtpHost := "smtp.example.com"
-	smtpPort := "587"
+			from := "tu-email@example.com"
+			password := "tu-contraseña"
+			to := email
+			smtpHost := "smtp.example.com"
+			smtpPort := "587"
 
-	auth := smtp.PlainAuth("", from, password, smtpHost)
+			auth := smtp.PlainAuth("", from, password, smtpHost)
 
-	msg := []byte("To: " + to + "\r\n" +
-		"Subject: Confirmación de Cuenta\r\n" +
-		"\r\n" +
-		body + "\r\n")
+			msg := []byte("To: " + to + "\r\n" +
+				"Subject: Confirmación de Cuenta\r\n" +
+				"\r\n" +
+				body + "\r\n")
 
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, msg)
-	if err != nil {
-		log.Printf("Error sending email: %v", err)
-		return err
-	}
+			err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, msg)
+			if err != nil {
+				log.Printf("Error sending email: %v", err)
+				return err
+			}
+	*/
 
-	return nil
+	return s.EmailSender.Send(username, email, token)
 }
 
 func (s *Service) SaveUser(signUpFormData model.SignUpFormData, token string) error {
@@ -88,10 +91,13 @@ func (s *Service) SaveUser(signUpFormData model.SignUpFormData, token string) er
 		return err
 	}
 
+	expirationDate := time.Now().Add(s.Config.UserTokenExpiryDays)
+
 	// Insertar el token de confirmación
 	_, err = tx.Exec("INSERT INTO confirmacion_cuenta (usuario_id, token, fecha_expiracion) VALUES ($1, $2, $3)",
-		userID, token, s.Config.UserTokenExpiryDays)
+		userID, token, expirationDate)
 	if err != nil {
+		log.Printf("debug:x here=%v", err)
 		tx.Rollback()
 		return err
 	}

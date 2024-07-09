@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"vecin/internal/config"
 	"vecin/internal/database"
+	"vecin/internal/email"
 	"vecin/internal/handler"
 	"vecin/internal/middleware"
 	"vecin/internal/service"
@@ -112,7 +113,10 @@ func createRoutes(svc *service.Service, dao *database.DAO, cfg *config.Config) *
 }
 
 func NewRouter(dao *database.DAO, limiter *rate.Limiter, cfg *config.Config) *mux.Router {
-	svc := service.NewService(*dao, cfg)
+	emailSender := email.MailerSend{
+		Config: cfg.Mailing,
+	}
+	svc := service.NewService(*dao, cfg, emailSender)
 	routes := createRoutes(svc, dao, cfg)
 	router := mux.NewRouter().StrictSlash(true)
 
