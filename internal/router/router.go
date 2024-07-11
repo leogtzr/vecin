@@ -100,6 +100,14 @@ func createRoutes(svc *service.Service, dao *database.DAO, cfg *config.Config) *
 			},
 		},
 		Router{
+			Name:   "Confirm Account",
+			Method: "GET",
+			Path:   "/confirmar-cuenta/{token}",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.ConfirmAccountHandler(svc, w, r)
+			},
+		},
+		Router{
 			Name:   "Gen Error - Remove this",
 			Method: "GET",
 			Path:   "/generror",
@@ -120,6 +128,7 @@ func NewRouter(dao *database.DAO, limiter *rate.Limiter, cfg *config.Config) *mu
 	routes := createRoutes(svc, dao, cfg)
 	router := mux.NewRouter().StrictSlash(true)
 
+	// TODO: check what to do with this handler...
 	nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 	})

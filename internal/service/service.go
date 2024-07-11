@@ -34,6 +34,61 @@ func (s *Service) CalculateExpiry(duration time.Duration) time.Time {
 	return time.Now().Add(duration)
 }
 
+func (s *Service) ConfirmAccount(token string) error {
+	log.Printf("debug:x token: (%s)", token)
+	var userID int
+	var expiry time.Time
+
+	tx, err := s.dao.DB().Begin()
+	if err != nil {
+		log.Printf("debug:x error: (%s), error al iniciar tx", err.Error())
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			// http.Error(w, "Error interno", http.StatusInternalServerError)
+			log.Printf("debug:x internal error")
+		}
+	}()
+
+	err = tx.QueryRow("SELECT usuario_id, fecha_expiracion FROM confirmacion_cuenta WHERE token = $1", token).Scan(&userID, &expiry)
+	if err != nil {
+		_ = tx.Rollback()
+		//http.Error(w, "Token inválido o expirado", http.StatusBadRequest)
+		return fmt.Errorf("invalid token or expired: %v", err)
+	}
+
+	if time.Now().After(expiry) {
+		_ = tx.Rollback()
+		//http.Error(w, "El token ha expirado", http.StatusBadRequest)
+		return fmt.Errorf("token has expired: %v", err)
+	}
+
+	_, err = tx.Exec("UPDATE usuario SET activo = TRUE WHERE usuario_id = $1", userID)
+	if err != nil {
+		_ = tx.Rollback()
+		//http.Error(w, "Error al activar la cuenta", http.StatusInternalServerError)
+		return fmt.Errorf("couldn't update usuario: %v", err)
+	}
+
+	_, err = tx.Exec("DELETE FROM confirmacion_cuenta WHERE token = $1", token)
+	if err != nil {
+		_ = tx.Rollback()
+		//http.Error(w, "Error al eliminar el token de confirmación", http.StatusInternalServerError)
+		return fmt.Errorf("couldn't delete confirmacion: %v", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		//http.Error(w, "Error al confirmar la transacción", http.StatusInternalServerError)
+		return fmt.Errorf("couldn't commit transaction: %v", err)
+	}
+
+	return nil
+}
+
+//
+
 func (s *Service) SendConfirmationEmail(username, email, token string) error {
 	// TODO: use configuration or a similar way to build the URL for confirmation...
 	/*
@@ -111,42 +166,42 @@ func (s *Service) SaveUser(signUpFormData model.SignUpFormData, token string) er
 	return nil
 }
 
-func (s *Service) ConfirmAccount(token string) error {
-	var userID int
-	var expiry time.Time
-
-	tx, err := s.dao.DB().Begin()
-	if err != nil {
-		return fmt.Errorf("error al iniciar la transacción: %v", err)
-	}
-
-	err = tx.QueryRow("SELECT usuario_id, fecha_expiracion FROM confirmacion_cuenta WHERE token = $1", token).Scan(&userID, &expiry)
-	if err != nil {
-		_ = tx.Rollback() // Revertir la transacción en caso de error
-		return fmt.Errorf("error al obtener la confirmación de cuenta: %v", err)
-	}
-
-	if time.Now().After(expiry) {
-		_ = tx.Rollback()
-		return fmt.Errorf("el token ha expirado")
-	}
-
-	_, err = tx.Exec("UPDATE usuario SET activo = TRUE WHERE usuario_id = $1", userID)
-	if err != nil {
-		_ = tx.Rollback()
-		return err
-	}
-
-	_, err = tx.Exec("DELETE FROM confirmacion_cuenta WHERE token = $1", token)
-	if err != nil {
-		_ = tx.Rollback()
-		return err
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return fmt.Errorf("error al confirmar la transacción: %v", err)
-	}
-
-	return nil
-}
+//func (s *Service) ConfirmAccount(token string) error {
+//	var userID int
+//	var expiry time.Time
+//
+//	tx, err := s.dao.DB().Begin()
+//	if err != nil {
+//		return fmt.Errorf("error al iniciar la transacción: %v", err)
+//	}
+//
+//	err = tx.QueryRow("SELECT usuario_id, fecha_expiracion FROM confirmacion_cuenta WHERE token = $1", token).Scan(&userID, &expiry)
+//	if err != nil {
+//		_ = tx.Rollback() // Revertir la transacción en caso de error
+//		return fmt.Errorf("error al obtener la confirmación de cuenta: %v", err)
+//	}
+//
+//	if time.Now().After(expiry) {
+//		_ = tx.Rollback()
+//		return fmt.Errorf("el token ha expirado")
+//	}
+//
+//	_, err = tx.Exec("UPDATE usuario SET activo = TRUE WHERE usuario_id = $1", userID)
+//	if err != nil {
+//		_ = tx.Rollback()
+//		return err
+//	}
+//
+//	_, err = tx.Exec("DELETE FROM confirmacion_cuenta WHERE token = $1", token)
+//	if err != nil {
+//		_ = tx.Rollback()
+//		return err
+//	}
+//
+//	err = tx.Commit()
+//	if err != nil {
+//		return fmt.Errorf("error al confirmar la transacción: %v", err)
+//	}
+//
+//	return nil
+//}
