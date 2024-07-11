@@ -126,7 +126,8 @@ func (s *Service) SendConfirmationEmail(username, email, token string) error {
 			}
 	*/
 
-	return s.EmailSender.Send(username, email, token)
+	//return s.EmailSender.Send(username, email, token)
+	return nil
 }
 
 func (s *Service) SaveUser(signUpFormData model.SignUpFormData, token string) error {

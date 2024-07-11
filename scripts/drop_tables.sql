@@ -29,9 +29,10 @@ DO $do$
                 EXECUTE 'DROP TABLE IF EXISTS pago CASCADE';
                 EXECUTE 'DROP TABLE IF EXISTS suscripcion CASCADE';
                 EXECUTE 'DROP TABLE IF EXISTS comunidad CASCADE';
+                EXECUTE 'DROP TABLE IF EXISTS confirmacion_cuenta CASCADE';
                 EXECUTE 'DROP TABLE IF EXISTS usuario CASCADE';
 
-                RAISE NOTICE 'Las tablas han sido truncadas.';
+                RAISE NOTICE 'Las tablas han sido droppeadas.';
             WHEN 'no' THEN
                 RAISE NOTICE 'Operación cancelada. La tabla no ha sido modificada.';
             ELSE
