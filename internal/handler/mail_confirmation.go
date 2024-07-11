@@ -2,10 +2,62 @@ package handler
 
 import (
 	"github.com/gorilla/mux"
+	"html/template"
 	"log"
 	"net/http"
+	"time"
 	"vecin/internal/service"
 )
+
+func redirectAccountActivationProblem(w http.ResponseWriter) {
+	templatePath := getTemplatePath("error-activate-account.html")
+
+	t, err := template.ParseFiles(templatePath)
+	if err != nil {
+		log.Printf("error: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusUnauthorized)
+
+	pageVariables := PageVariables{
+		Year:     time.Now().Format("2006"),
+		AppName:  "Vecin",
+		LoggedIn: false,
+	}
+
+	err = t.Execute(w, pageVariables)
+	if err != nil {
+		log.Printf("error: %v", err)
+		return
+	}
+}
+
+func redirectAccountActivated(w http.ResponseWriter) {
+	templatePath := getTemplatePath("account-activated.html")
+
+	t, err := template.ParseFiles(templatePath)
+	if err != nil {
+		log.Printf("error: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusSeeOther)
+
+	pageVariables := PageVariables{
+		Year:     time.Now().Format("2006"),
+		AppName:  "Vecin",
+		LoggedIn: false,
+	}
+
+	err = t.Execute(w, pageVariables)
+	if err != nil {
+		log.Printf("error: %v", err)
+		return
+	}
+}
 
 func ConfirmAccountHandler(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -15,56 +67,10 @@ func ConfirmAccountHandler(svc *service.Service, w http.ResponseWriter, r *http.
 	err := svc.ConfirmAccount(token)
 	if err != nil {
 		log.Printf("error: %v", err)
-		// TODO: redirect to error page
+		redirectAccountActivationProblem(w)
+
+		return
 	}
 
-	//var userID int
-	//var expiry time.Time
-
-	/*
-		tx, err := db.Begin()
-		if err != nil {
-			http.Error(w, "Error al iniciar la transacción", http.StatusInternalServerError)
-			return
-		}
-		defer func() {
-			if p := recover(); p != nil {
-				tx.Rollback()
-				http.Error(w, "Error interno", http.StatusInternalServerError)
-			}
-		}()
-
-		err = tx.QueryRow("SELECT usuario_id, fecha_expiracion FROM confirmacion_cuenta WHERE token = $1", token).Scan(&userID, &expiry)
-		if err != nil {
-			tx.Rollback()
-			http.Error(w, "Token inválido o expirado", http.StatusBadRequest)
-			return
-		}
-
-		if time.Now().After(expiry) {
-			tx.Rollback()
-			http.Error(w, "El token ha expirado", http.StatusBadRequest)
-			return
-		}
-
-		_, err = tx.Exec("UPDATE usuario SET activo = TRUE WHERE usuario_id = $1", userID)
-		if err != nil {
-			tx.Rollback()
-			http.Error(w, "Error al activar la cuenta", http.StatusInternalServerError)
-			return
-		}
-
-		_, err = tx.Exec("DELETE FROM confirmacion_cuenta WHERE token = $1", token)
-		if err != nil {
-			tx.Rollback()
-			http.Error(w, "Error al eliminar el token de confirmación", http.StatusInternalServerError)
-			return
-		}
-
-		if err := tx.Commit(); err != nil {
-			http.Error(w, "Error al confirmar la transacción", http.StatusInternalServerError)
-			return
-		}*/
-
-	http.Redirect(w, r, "/cuenta-activada", http.StatusSeeOther)
+	redirectAccountActivated(w)
 }

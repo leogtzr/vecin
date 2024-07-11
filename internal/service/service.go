@@ -87,8 +87,6 @@ func (s *Service) ConfirmAccount(token string) error {
 	return nil
 }
 
-//
-
 func (s *Service) SendConfirmationEmail(username, email, token string) error {
 	// TODO: use configuration or a similar way to build the URL for confirmation...
 	/*
