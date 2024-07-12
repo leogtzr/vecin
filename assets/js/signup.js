@@ -36,10 +36,7 @@ $(document).ready(function() {
                 console.log('OK');
                 console.log(response);
 
-                // Redirigir a otra página después del registro exitoso
-                // TODO: fix this...
-                window.location.href = '/some-other-page';
-
+                window.location.href = '/confirm-account-pending';
             },
             error: function(xhr, status, error) {
                 let errorMessage = 'Unknown error';

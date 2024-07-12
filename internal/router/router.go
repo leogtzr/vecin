@@ -108,6 +108,14 @@ func createRoutes(svc *service.Service, dao *database.DAO, cfg *config.Config) *
 			},
 		},
 		Router{
+			Name:   "Confirm Account - waiting for confirmation through link",
+			Method: "GET",
+			Path:   "/confirm-account-pending",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.ConfirmAccountLinkSent(svc, w, r)
+			},
+		},
+		Router{
 			Name:   "Gen Error - Remove this",
 			Method: "GET",
 			Path:   "/generror",

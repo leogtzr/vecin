@@ -16,7 +16,7 @@ type SignUpFormData struct {
 	PaymentOption   string `json:"paymentOption"`
 }
 
-// Al momento de guardar un usuario, necesitaremos un objeto con la información que hemos
+// SignUpUserConfig Al momento de guardar un usuario, necesitaremos un objeto con la información que hemos
 // recibido del formulario desde el Front-end, también necesitaremos el Token generado
 type SignUpUserConfig struct {
 	SignUpFormData SignUpFormData

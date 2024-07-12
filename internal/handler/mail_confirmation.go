@@ -74,3 +74,28 @@ func ConfirmAccountHandler(svc *service.Service, w http.ResponseWriter, r *http.
 
 	redirectAccountActivated(w)
 }
+
+func ConfirmAccountLinkSent(svc *service.Service, w http.ResponseWriter, r *http.Request) {
+	templatePath := getTemplatePath("check-your-email-account.html")
+
+	t, err := template.ParseFiles(templatePath)
+	if err != nil {
+		log.Printf("error: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusSeeOther)
+
+	pageVariables := PageVariables{
+		Year:     time.Now().Format("2006"),
+		AppName:  "Vecin",
+		LoggedIn: false,
+	}
+
+	err = t.Execute(w, pageVariables)
+	if err != nil {
+		log.Printf("error: %v", err)
+		return
+	}
+}

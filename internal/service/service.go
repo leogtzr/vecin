@@ -88,44 +88,6 @@ func (s *Service) ConfirmAccount(token string) error {
 }
 
 func (s *Service) SendConfirmationEmail(username, email, token string) error {
-	// TODO: use configuration or a similar way to build the URL for confirmation...
-	/*
-			confirmationLink := fmt.Sprintf("https://tu-sitio.com/confirmar-cuenta/%s", token)
-			body := fmt.Sprintf(`
-		Hola %s,
-
-		Gracias por registrarte en Vecin. Por favor, haz clic en el siguiente enlace para confirmar tu cuenta:
-
-		%s
-
-		Si no te registraste en Vecin, ignora este correo.
-
-		Saludos,
-		El equipo de Vecin
-		`, username, confirmationLink)
-
-			// TODO: delegate this to the email sender object
-
-			from := "tu-email@example.com"
-			password := "tu-contraseña"
-			to := email
-			smtpHost := "smtp.example.com"
-			smtpPort := "587"
-
-			auth := smtp.PlainAuth("", from, password, smtpHost)
-
-			msg := []byte("To: " + to + "\r\n" +
-				"Subject: Confirmación de Cuenta\r\n" +
-				"\r\n" +
-				body + "\r\n")
-
-			err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, msg)
-			if err != nil {
-				log.Printf("Error sending email: %v", err)
-				return err
-			}
-	*/
-
 	//return s.EmailSender.Send(username, email, token)
 	return nil
 }
