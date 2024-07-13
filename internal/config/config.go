@@ -42,7 +42,7 @@ func NewConfig() (*Config, error) {
 		DBUser:              getEnv("VECIN_DB_USER", ""),
 		DBPassword:          getEnv("VECIN_DB_PASSWORD", ""),
 		DBName:              getEnv("VECIN_DB", ""),
-		DBPort:              getEnv("PGPORT", "5432"),
+		DBPort:              getEnv("VECIN_DB_PORT", "5432"),
 		RunMode:             getEnv("RUN_MODE", "dev"),
 		GeoNamesUser:        getEnv("GEONAMES_USERNAME", ""),
 		HTTPPort:            getEnv("PORT", "8180"),
