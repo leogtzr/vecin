@@ -10,6 +10,7 @@ type DAO interface {
 	Close() error
 	Ping() error
 	GetUserByUsername(username string) (*model.Usuario, error)
+	GetUserByEmail(email string) (*model.Usuario, error)
 	SaveCommunity(data model.RegisterFormData) (int, error)
 	DB() *sql.DB
 }

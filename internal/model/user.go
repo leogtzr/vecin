@@ -1,12 +1,12 @@
 package model
 
-import "time"
-
 type Usuario struct {
 	ID             int
-	NombreUsuario  string
-	NombreCompleto string
+	Username       string
+	Nombre         string
+	Apellido       string
+	Telefono       string
 	Email          string
 	HashContrasena string
-	FechaCreacion  time.Time
+	Activo         bool
 }

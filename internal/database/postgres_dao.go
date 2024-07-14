@@ -61,12 +61,29 @@ func (dao *daoImpl) Close() error {
 }
 
 func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
-	query := `SELECT usuario_id, nombre_usuario, nombre_completo, email, hash_contrasena, fecha_creacion 
+	query := `SELECT usuario_id, username, nombre, apellido, telefono, email, hash_contrasena, activo 
               FROM usuario WHERE nombre_usuario = $1`
 	row := dao.db.QueryRow(query, username)
 
 	var user model.Usuario
-	err := row.Scan(&user.ID, &user.NombreUsuario, &user.NombreCompleto, &user.Email, &user.HashContrasena, &user.FechaCreacion)
+	err := row.Scan(&user.ID, &user.Username, &user.Nombre, &user.Apellido, &user.Telefono, &user.Email, &user.HashContrasena, &user.Activo)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, err // Usuario no encontrado
+		}
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (dao *daoImpl) GetUserByEmail(email string) (*model.Usuario, error) {
+	query := `SELECT usuario_id, username, nombre, apellido, telefono, email, hash_contrasena, activo 
+              FROM usuario WHERE email = $1`
+	row := dao.db.QueryRow(query, email)
+
+	var user model.Usuario
+	err := row.Scan(&user.ID, &user.Username, &user.Nombre, &user.Apellido, &user.Telefono, &user.Email, &user.HashContrasena, &user.Activo)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, err // Usuario no encontrado

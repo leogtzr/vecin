@@ -84,6 +84,14 @@ func createRoutes(svc *service.Service, dao *database.DAO, cfg *config.Config) *
 			},
 		},
 		Router{
+			Name:   "Check if email exists",
+			Method: "POST",
+			Path:   "/check-email",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.CheckEmail(dao, w, r)
+			},
+		},
+		Router{
 			Name:   "Create Account - Page",
 			Method: "GET",
 			Path:   "/create-account",

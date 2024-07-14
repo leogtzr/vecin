@@ -104,7 +104,8 @@ func (s *Service) SaveUser(signUpFormData model.SignUpFormData, token string) er
 	err = tx.QueryRow("INSERT INTO usuario (username, nombre, apellido, telefono, email, password_hash, activo) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING usuario_id",
 		signUpFormData.Username, signUpFormData.Nombre, signUpFormData.Apellido, signUpFormData.Telefono, signUpFormData.Email, signUpFormData.Password, false).Scan(&userID)
 	if err != nil {
-		tx.Rollback()
+		log.Printf("debug:x error inserting user: %v", err)
+		_ = tx.Rollback()
 		return err
 	}
 
@@ -128,42 +129,11 @@ func (s *Service) SaveUser(signUpFormData model.SignUpFormData, token string) er
 	return nil
 }
 
-//func (s *Service) ConfirmAccount(token string) error {
-//	var userID int
-//	var expiry time.Time
-//
-//	tx, err := s.dao.DB().Begin()
-//	if err != nil {
-//		return fmt.Errorf("error al iniciar la transacción: %v", err)
-//	}
-//
-//	err = tx.QueryRow("SELECT usuario_id, fecha_expiracion FROM confirmacion_cuenta WHERE token = $1", token).Scan(&userID, &expiry)
-//	if err != nil {
-//		_ = tx.Rollback() // Revertir la transacción en caso de error
-//		return fmt.Errorf("error al obtener la confirmación de cuenta: %v", err)
-//	}
-//
-//	if time.Now().After(expiry) {
-//		_ = tx.Rollback()
-//		return fmt.Errorf("el token ha expirado")
-//	}
-//
-//	_, err = tx.Exec("UPDATE usuario SET activo = TRUE WHERE usuario_id = $1", userID)
-//	if err != nil {
-//		_ = tx.Rollback()
-//		return err
-//	}
-//
-//	_, err = tx.Exec("DELETE FROM confirmacion_cuenta WHERE token = $1", token)
-//	if err != nil {
-//		_ = tx.Rollback()
-//		return err
-//	}
-//
-//	err = tx.Commit()
-//	if err != nil {
-//		return fmt.Errorf("error al confirmar la transacción: %v", err)
-//	}
-//
-//	return nil
-//}
+func (s *Service) CheckEmail(email string) (model.Usuario, error) {
+	user, err := s.dao.GetUserByEmail(email)
+	if err != nil {
+		return model.Usuario{}, err
+	}
+
+	return *user, nil
+}
