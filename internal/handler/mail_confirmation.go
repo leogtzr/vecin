@@ -75,7 +75,7 @@ func ConfirmAccountHandler(svc *service.Service, w http.ResponseWriter, r *http.
 	redirectAccountActivated(w)
 }
 
-func ConfirmAccountLinkSent(svc *service.Service, w http.ResponseWriter, r *http.Request) {
+func ConfirmAccountLinkSent(w http.ResponseWriter, r *http.Request) {
 	templatePath := getTemplatePath("check-your-email-account.html")
 
 	t, err := template.ParseFiles(templatePath)

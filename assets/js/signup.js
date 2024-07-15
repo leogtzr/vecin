@@ -95,36 +95,6 @@ $(document).ready(function() {
                 }, 2000);
             }
         });
-
-        /*
-        $.ajax({
-            url: '/create-account',
-            type: 'POST',
-            data: JSON.stringify(formData),
-            contentType: 'application/json',
-            success: function(response) {
-                console.log('OK');
-                console.log(response);
-
-                window.location.href = '/confirm-account-pending';
-            },
-            error: function(xhr, status, error) {
-                let errorMessage = 'Unknown error';
-                try {
-                    const responseJSON = JSON.parse(xhr.responseText);
-                    errorMessage = responseJSON.message || errorMessage;
-                } catch (e) {
-                    console.error('Error parsing JSON:', e);
-                }
-
-                $('#alert').text('Error en el registro: ' + errorMessage).fadeIn();
-                setTimeout(function() {
-                    $('#alert').fadeOut();
-                }, 2000);
-            }
-        });
-        */
-
     });
 
 });
