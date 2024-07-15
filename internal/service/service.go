@@ -89,8 +89,8 @@ func (s *Service) ConfirmAccount(token string) error {
 
 func (s *Service) SendConfirmationEmail(username, email, token string) error {
 	//bypass email sending:
-	//return s.EmailSender.Send(username, email, token)
-	return nil
+	return s.EmailSender.Send(username, email, token)
+	//return nil
 }
 
 func (s *Service) SaveUser(signUpFormData model.SignUpFormData, token string) error {
