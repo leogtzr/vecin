@@ -1,4 +1,4 @@
-\echo '¿Estás seguro de querer eliminar las tablas? (yes/no)'
+\echo -n '¿Estás seguro de querer eliminar las tablas? (yes/no): '
 \prompt confirmacion
 
 SET my.confirmacion = :'confirmacion';

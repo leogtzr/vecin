@@ -129,11 +129,12 @@ func (s *Service) SaveUser(signUpFormData model.SignUpFormData, token string) er
 	return nil
 }
 
-func (s *Service) CheckEmail(email string) (model.Usuario, error) {
-	user, err := s.dao.GetUserByEmail(email)
+func (s *Service) CheckEmail(email string) (bool, error) {
+	exists, err := s.dao.UserExistsByEmail(email)
 	if err != nil {
-		return model.Usuario{}, err
+		log.Printf("debug:x error: (%s)", err)
+		return false, err
 	}
 
-	return *user, nil
+	return exists, nil
 }

@@ -10,3 +10,8 @@ type Usuario struct {
 	HashContrasena string
 	Activo         bool
 }
+
+type UserExistence struct {
+	Email  string
+	Exists bool
+}

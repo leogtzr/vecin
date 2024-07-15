@@ -88,7 +88,7 @@ func createRoutes(svc *service.Service, dao *database.DAO, cfg *config.Config) *
 			Method: "POST",
 			Path:   "/check-email",
 			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
-				handler.CheckEmail(dao, w, r)
+				handler.CheckEmail(svc, w, r)
 			},
 		},
 		Router{

@@ -1433,10 +1433,6 @@ func SignUp(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: guardar el usuario a la DB
-	// TODO: lanzar el mecanismo de confirmación de cuenta por medio de verificación de correo electrónico
-	// TODO: Service se hará cargo de todo esto.
-
 	token, err := svc.GenerateToken()
 	if err != nil {
 		log.Printf("Error generating token: %v", err)
@@ -1476,6 +1472,31 @@ func writePasswordDoNotMatchToResponse(w http.ResponseWriter) {
 	_ = json.NewEncoder(w).Encode(map[string]string{"message": "passwords do not match"})
 }
 
-func CheckEmail(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
+func CheckEmail(svc *service.Service, w http.ResponseWriter, r *http.Request) {
+	type CheckEmailRequest struct {
+		Email string `json:"email"`
+	}
 
+	var req CheckEmailRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+
+		return
+	}
+
+	type CheckEmailResponse struct {
+		Exists bool `json:"exists"`
+	}
+
+	exists, err := svc.CheckEmail(req.Email)
+	if err != nil {
+		log.Printf("Error checking email: %v", err)
+		http.Error(w, "Error checking email", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(CheckEmailResponse{
+		Exists: exists,
+	})
 }

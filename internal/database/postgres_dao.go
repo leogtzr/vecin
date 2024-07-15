@@ -61,7 +61,7 @@ func (dao *daoImpl) Close() error {
 }
 
 func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
-	query := `SELECT usuario_id, username, nombre, apellido, telefono, email, hash_contrasena, activo 
+	query := `SELECT usuario_id, username, nombre, apellido, telefono, email, password_hash, activo 
               FROM usuario WHERE nombre_usuario = $1`
 	row := dao.db.QueryRow(query, username)
 
@@ -78,7 +78,7 @@ func (dao *daoImpl) GetUserByUsername(username string) (*model.Usuario, error) {
 }
 
 func (dao *daoImpl) GetUserByEmail(email string) (*model.Usuario, error) {
-	query := `SELECT usuario_id, username, nombre, apellido, telefono, email, hash_contrasena, activo 
+	query := `SELECT usuario_id, username, nombre, apellido, telefono, email, password_hash, activo 
               FROM usuario WHERE email = $1`
 	row := dao.db.QueryRow(query, email)
 
@@ -86,12 +86,27 @@ func (dao *daoImpl) GetUserByEmail(email string) (*model.Usuario, error) {
 	err := row.Scan(&user.ID, &user.Username, &user.Nombre, &user.Apellido, &user.Telefono, &user.Email, &user.HashContrasena, &user.Activo)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, err // Usuario no encontrado
+			return nil, err
 		}
 		return nil, err
 	}
 
 	return &user, nil
+}
+
+func (dao *daoImpl) UserExistsByEmail(email string) (bool, error) {
+	query := `SELECT 1 FROM usuario WHERE email = $1`
+	row := dao.db.QueryRow(query, email)
+
+	var exists int
+	if err := row.Scan(&exists); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return true, nil
 }
 
 // SaveCommunity saves a comunity into the database.
