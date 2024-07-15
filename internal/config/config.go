@@ -9,6 +9,8 @@ import (
 type Mailing struct {
 	ApiKey           string
 	ConfirmationLink string
+	EmailSubject     string
+	MailSenderEmail  string
 }
 
 type Config struct {
@@ -52,6 +54,8 @@ func NewConfig() (*Config, error) {
 		Mailing: Mailing{
 			ApiKey:           getEnv("MAILSENDER_API_KEY", ""),
 			ConfirmationLink: getEnv("EMAIL_ACCOUNT_CONFIRMATION_LINK", ""),
+			EmailSubject:     getEnv("VECIN_CONFIRMATION_EMAIL_SUBJECT", ""),
+			MailSenderEmail:  getEnv("MAILSENDER_EMAIL_SENDER", ""),
 		},
 	}
 

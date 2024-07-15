@@ -30,7 +30,7 @@ func (m MailerSend) Send(user, email, token string) error {
 	defer cancel()
 
 	// TODO:put this in an env variable or a configuration:
-	subject := "Confirma tu cuenta - Vecin"
+	//subject := "Confirma tu cuenta - Vecin"
 
 	// Variables para el mensaje
 	recipientName := user
@@ -49,7 +49,7 @@ Si no te registraste en Vecin, ignora este correo.
 Saludos,
 El equipo de Vecin`, recipientName, confirmationLink, token)
 
-	html := fmt.Sprintf(`Hola, %s,<br><br>
+	html := fmt.Sprintf(`Hola, <b>%s</b>,<br><br>
 Gracias por registrarte en Vecin. Por favor, haz clic en el siguiente enlace para confirmar tu cuenta:<br><br>
 <a href="%s/%s">Confirmar cuenta</a><br><br>
 🏡<br><br>
@@ -59,7 +59,7 @@ El equipo de Vecin`, recipientName, confirmationLink, token)
 
 	from := mailersend.From{
 		Name:  "Vecin",
-		Email: "vecin@trial-yzkq3401v96ld796.mlsender.net",
+		Email: m.Config.MailSenderEmail,
 	}
 
 	recipients := []mailersend.Recipient{
@@ -91,7 +91,7 @@ El equipo de Vecin`, recipientName, confirmationLink, token)
 
 	message.SetFrom(from)
 	message.SetRecipients(recipients)
-	message.SetSubject(subject)
+	message.SetSubject(m.Config.EmailSubject)
 	message.SetHTML(html)
 	message.SetText(text)
 	message.SetSubstitutions(variables)
