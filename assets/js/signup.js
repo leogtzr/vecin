@@ -1,6 +1,6 @@
 $(document).ready(function() {
     function isValidPhoneNumber(phone) {
-        const phoneRegex = /^\+?[1-9]\d{10,12}$/;
+        const phoneRegex = /^\+?[1-9]\d{9,11}$/;
         return phoneRegex.test(phone);
     }
 

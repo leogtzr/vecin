@@ -64,7 +64,7 @@
 <div class="confirm-container">
     <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dpxxx.png" alt="Vecin Logo" style="width: 75px;">
     <h2 class="mt-4">¡Cuenta Activada!</h2>
-    <p>Hola, <strong><span id="userName"></span></strong></p>
+    <p>Hola, <strong><span>{{.UserName}}</span></strong></p>
     <p>Ahora puedes <a href="/login">iniciar sesión</a> para proceder.</p>
     <a href="/login" class="btn btn-primary">Iniciar Sesión</a>
     <div class="footer-links mt-3">
@@ -75,10 +75,5 @@
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-<script>
-    // Simulación de la obtención del nombre del usuario
-    const userName = "Nombre del Usuario"; // Aquí reemplaza con el nombre real del usuario
-    document.getElementById("userName").innerText = userName;
-</script>
 </body>
 </html>

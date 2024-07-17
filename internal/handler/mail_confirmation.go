@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"vecin/internal/model"
 	"vecin/internal/service"
 )
 
@@ -34,7 +35,7 @@ func redirectAccountActivationProblem(w http.ResponseWriter) {
 	}
 }
 
-func redirectAccountActivated(w http.ResponseWriter) {
+func redirectAccountActivated(userConfirmedAccount model.Usuario, w http.ResponseWriter) {
 	templatePath := getTemplatePath("account-activated.html")
 
 	t, err := template.ParseFiles(templatePath)
@@ -46,10 +47,10 @@ func redirectAccountActivated(w http.ResponseWriter) {
 
 	w.WriteHeader(http.StatusSeeOther)
 
-	pageVariables := PageVariables{
-		Year:     time.Now().Format("2006"),
-		AppName:  "Vecin",
-		LoggedIn: false,
+	pageVariables := struct {
+		UserName string
+	}{
+		UserName: userConfirmedAccount.Username,
 	}
 
 	err = t.Execute(w, pageVariables)
@@ -64,7 +65,7 @@ func ConfirmAccountHandler(svc *service.Service, w http.ResponseWriter, r *http.
 	token := vars["token"]
 
 	log.Printf("debug:x token: (%s)", token)
-	err := svc.ConfirmAccount(token)
+	userConfirmedAccount, err := svc.ConfirmAccount(token)
 	if err != nil {
 		log.Printf("error: %v", err)
 		redirectAccountActivationProblem(w)
@@ -72,7 +73,7 @@ func ConfirmAccountHandler(svc *service.Service, w http.ResponseWriter, r *http.
 		return
 	}
 
-	redirectAccountActivated(w)
+	redirectAccountActivated(userConfirmedAccount, w)
 }
 
 func ConfirmAccountLinkSent(w http.ResponseWriter, r *http.Request) {
