@@ -64,21 +64,21 @@
             display: none;
             margin-top: 1rem;
         }
-        .payment-options h4 {
-            text-align: center;
-        }
-        .payment-options {
-            margin-top: 1rem;
-            text-align: left;
-        }
-        .payment-option {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        .payment-option input {
-            margin-right: 1rem;
-        }
+        /*.payment-options h4 {*/
+        /*    text-align: center;*/
+        /*}*/
+        /*.payment-options {*/
+        /*    margin-top: 1rem;*/
+        /*    text-align: left;*/
+        /*}*/
+        /*.payment-option {*/
+        /*    display: flex;*/
+        /*    align-items: center;*/
+        /*    margin-bottom: 1rem;*/
+        /*}*/
+        /*.payment-option input {*/
+        /*    margin-right: 1rem;*/
+        /*}*/
         .register-container img {
             display: block;
             margin: 0 auto 1.5rem;
@@ -105,6 +105,7 @@
         <div class="form-group">
             <label for="telefono">Teléfono</label>
             <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="Ingresa tu teléfono">
+            <small id="phoneHelp" class="form-text text-muted" style="display:none;"></small>
         </div>
         <div class="form-group">
             <label for="email">Correo electrónico</label>
@@ -120,23 +121,23 @@
         </div>
 
         <!-- Nuevos campos para el pago -->
-        <div class="payment-options">
-            <h4 class="mt-4">Modelos de Pago</h4>
-            <div class="payment-option">
-                <input type="radio" id="mensual" name="payment_option" value="mensual" required>
-                <label for="mensual">
-                    <strong>Mensual</strong> - $10/mes<br>
-                    <span>Acceso a todas las funcionalidades por un mes.</span>
-                </label>
-            </div>
-            <div class="payment-option">
-                <input type="radio" id="anual" name="payment_option" value="anual" required>
-                <label for="anual">
-                    <strong>Anual</strong> - $100/año<br>
-                    <span>Acceso a todas las funcionalidades por un año. ¡Ahorra 20%!</span>
-                </label>
-            </div>
-        </div>
+<!--        <div class="payment-options">-->
+<!--            <h4 class="mt-4">Modelos de Pago</h4>-->
+<!--            <div class="payment-option">-->
+<!--                <input type="radio" id="mensual" name="payment_option" value="mensual" required>-->
+<!--                <label for="mensual">-->
+<!--                    <strong>Mensual</strong> - $10/mes<br>-->
+<!--                    <span>Acceso a todas las funcionalidades por un mes.</span>-->
+<!--                </label>-->
+<!--            </div>-->
+<!--            <div class="payment-option">-->
+<!--                <input type="radio" id="anual" name="payment_option" value="anual" required>-->
+<!--                <label for="anual">-->
+<!--                    <strong>Anual</strong> - $100/año<br>-->
+<!--                    <span>Acceso a todas las funcionalidades por un año. ¡Ahorra 20%!</span>-->
+<!--                </label>-->
+<!--            </div>-->
+<!--        </div>-->
 
         <div class="alert alert-danger" id="alert">Las contraseñas no coinciden. Por favor, inténtelo de nuevo.</div>
         <button type="submit" class="btn btn-primary">Registrar</button>

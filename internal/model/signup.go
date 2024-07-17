@@ -13,7 +13,7 @@ type SignUpFormData struct {
 	Email           string `json:"email"`
 	Password        string `json:"password"`
 	ConfirmPassword string `json:"confirmPassword"`
-	PaymentOption   string `json:"paymentOption"`
+	//PaymentOption   string `json:"paymentOption"`
 }
 
 // SignUpUserConfig Al momento de guardar un usuario, necesitaremos un objeto con la información que hemos
@@ -25,6 +25,6 @@ type SignUpUserConfig struct {
 }
 
 func (s SignUpFormData) String() string {
-	return fmt.Sprintf("Nombre: (%s), Username: (%s), Apellido: (%s), Telefono: (%s), Email: (%s), Password: (%s), ConfirmPassword: (%s), PaymentOption: (%s)",
-		s.Nombre, s.Username, s.Apellido, s.Telefono, s.Email, s.Password, s.ConfirmPassword, s.PaymentOption)
+	return fmt.Sprintf("Nombre: (%s), Username: (%s), Apellido: (%s), Telefono: (%s), Email: (%s), Password: (%s), ConfirmPassword: (%s)",
+		s.Nombre, s.Username, s.Apellido, s.Telefono, s.Email, s.Password, s.ConfirmPassword)
 }

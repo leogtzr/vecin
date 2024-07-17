@@ -25,8 +25,8 @@ CREATE TABLE comunidad (
 
 CREATE TABLE suscripcion (
      suscripcion_id SERIAL PRIMARY KEY,
-     usuario_id INT REFERENCES usuario(usuario_id),
-     comunidad_id INT REFERENCES comunidad(comunidad_id),
+     usuario_id INT REFERENCES usuario(usuario_id) ON DELETE CASCADE,
+     comunidad_id INT REFERENCES comunidad(comunidad_id) ON DELETE CASCADE,
      modelo_suscripcion VARCHAR(20) NOT NULL CHECK (modelo_suscripcion IN ('Mensual', 'Bimestral', 'Anual')),
      fecha_inicio DATE NOT NULL,
      fecha_fin DATE NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE suscripcion (
 
 CREATE TABLE pago (
   pago_id SERIAL PRIMARY KEY,
-  suscripcion_id INT REFERENCES suscripcion(suscripcion_id),
+  suscripcion_id INT REFERENCES suscripcion(suscripcion_id) ON DELETE CASCADE,
   fecha_pago DATE NOT NULL,
   monto DECIMAL(10, 2) NOT NULL
 );

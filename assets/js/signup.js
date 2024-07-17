@@ -1,9 +1,35 @@
 $(document).ready(function() {
+    function isValidPhoneNumber(phone) {
+        const phoneRegex = /^\+?[1-9]\d{10,10}$/;
+        return phoneRegex.test(phone);
+    }
+
+    function isValidPassword(password) {
+        const minLength = 8;
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasNumbers = /\d/.test(password);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+        return password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
+    }
+
+    $('#telefono').on('input', function() {
+        if ($(this).val() && !isValidPhoneNumber($(this).val())) {
+            $(this).addClass('is-invalid');
+            $('#phoneHelp').text('Por favor, ingrese un número de teléfono válido.').show();
+        } else {
+            $(this).removeClass('is-invalid').addClass('is-valid');
+            $('#phoneHelp').hide();
+        }
+    });
+
     $('#signUp').on('submit', function(e) {
         e.preventDefault();
 
         var password = $('#password').val();
         var confirmPassword = $('#confirm_password').val();
+        var phone = $('#telefono').val();
 
         if (password !== confirmPassword) {
             $('#alert').fadeIn();
@@ -16,16 +42,24 @@ $(document).ready(function() {
 
         var email = $('#email').val();
 
-        var formData = {
-            username: $('#username').val(),
-            nombre: $('#nombre').val(),
-            apellido: $('#apellido').val(),
-            telefono: $('#telefono').val(),
-            email: email,
-            password: password,
-            confirmPassword: confirmPassword,
-            paymentOption: $('input[name="payment_option"]:checked').val()
-        };
+        if (phone && !isValidPhoneNumber(phone)) {
+            $('#alert').text('Por favor, ingrese un número de teléfono válido.').fadeIn();
+            setTimeout(function() {
+                $('#alert').fadeOut();
+            }, 6000);
+            return;
+        }
+
+        // var formData = {
+        //     username: $('#username').val(),
+        //     nombre: $('#nombre').val(),
+        //     apellido: $('#apellido').val(),
+        //     telefono: $('#telefono').val(),
+        //     email: email,
+        //     password: password,
+        //     confirmPassword: confirmPassword,
+        //     paymentOption: $('input[name="payment_option"]:checked').val()
+        // };
 
         $.ajax({
             url: '/check-email',
@@ -43,11 +77,11 @@ $(document).ready(function() {
                         username: $('#username').val(),
                         nombre: $('#nombre').val(),
                         apellido: $('#apellido').val(),
-                        telefono: $('#telefono').val(),
+                        telefono: phone,
                         email: email,
                         password: password,
                         confirmPassword: confirmPassword,
-                        paymentOption: $('input[name="payment_option"]:checked').val()
+                        // paymentOption: $('input[name="payment_option"]:checked').val()
                     };
 
                     console.log('Will try to send: ');

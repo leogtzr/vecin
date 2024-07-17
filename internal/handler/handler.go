@@ -65,7 +65,7 @@ func addTemplateFiles(additionalFiles ...string) []string {
 
 // ToDo: finish this...
 func isLoggedIn(r *http.Request) bool {
-	return !true
+	return false
 }
 
 // IndexPage renders the home or index page.
@@ -175,6 +175,11 @@ func redirectLoginPage(w http.ResponseWriter) {
 		log.Printf("error: %v", err)
 		return
 	}
+}
+
+// If the user is already logged in, we will redirect to the dashboard.
+func redirectToDashboard(w http.ResponseWriter) {
+	// templatePath := getTemplatePath("dashboard.html")
 }
 
 // RegisterFracc handles the rendering to register a fraccionamiento.
@@ -1499,4 +1504,16 @@ func CheckEmail(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(CheckEmailResponse{
 		Exists: exists,
 	})
+}
+
+func LoginPage(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
+	// Check if the user is already logged in, if it is then redirect to the dashboard.
+	loggedIn := isLoggedIn(r)
+	if loggedIn {
+		redirectToDashboard(w)
+
+		return
+	}
+
+	redirectLoginPage(w)
 }
