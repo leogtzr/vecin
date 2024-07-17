@@ -1,6 +1,6 @@
 $(document).ready(function() {
     function isValidPhoneNumber(phone) {
-        const phoneRegex = /^\+?[1-9]\d{10,10}$/;
+        const phoneRegex = /^\+?[1-9]\d{10,12}$/;
         return phoneRegex.test(phone);
     }
 
@@ -13,6 +13,16 @@ $(document).ready(function() {
 
         return password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
     }
+
+    $('#password').on('input', function() {
+        if (!isValidPassword($(this).val())) {
+            $(this).addClass('is-invalid');
+            $('#passwordHelp').text('La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y un carácter especial.').show();
+        } else {
+            $(this).removeClass('is-invalid').addClass('is-valid');
+            $('#passwordHelp').hide();
+        }
+    });
 
     $('#telefono').on('input', function() {
         if ($(this).val() && !isValidPhoneNumber($(this).val())) {
@@ -30,6 +40,14 @@ $(document).ready(function() {
         var password = $('#password').val();
         var confirmPassword = $('#confirm_password').val();
         var phone = $('#telefono').val();
+
+        if (!isValidPassword(password)) {
+            $('#alert').text('La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y un carácter especial.').fadeIn();
+            setTimeout(function() {
+                $('#alert').fadeOut();
+            }, 6000);
+            return;
+        }
 
         if (password !== confirmPassword) {
             $('#alert').fadeIn();
@@ -49,17 +67,6 @@ $(document).ready(function() {
             }, 6000);
             return;
         }
-
-        // var formData = {
-        //     username: $('#username').val(),
-        //     nombre: $('#nombre').val(),
-        //     apellido: $('#apellido').val(),
-        //     telefono: $('#telefono').val(),
-        //     email: email,
-        //     password: password,
-        //     confirmPassword: confirmPassword,
-        //     paymentOption: $('input[name="payment_option"]:checked').val()
-        // };
 
         $.ajax({
             url: '/check-email',
