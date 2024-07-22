@@ -122,23 +122,20 @@ func (s *Service) SaveUser(signUpFormData model.SignUpFormData, token string) er
 	err = tx.QueryRow("INSERT INTO usuario (username, nombre, apellido, telefono, email, password_hash, activo) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING usuario_id",
 		signUpFormData.Username, signUpFormData.Nombre, signUpFormData.Apellido, signUpFormData.Telefono, signUpFormData.Email, signUpFormData.Password, false).Scan(&userID)
 	if err != nil {
-		log.Printf("debug:x error inserting user: %v", err)
+		log.Printf("debug:x error inserting user (table:usuario): %v", err)
 		_ = tx.Rollback()
 		return err
 	}
 
 	expirationDate := time.Now().Add(s.Config.UserTokenExpiryDays)
 
-	// Insertar el token de confirmación
 	_, err = tx.Exec("INSERT INTO confirmacion_cuenta (usuario_id, token, fecha_expiracion) VALUES ($1, $2, $3)",
 		userID, token, expirationDate)
 	if err != nil {
-		log.Printf("debug:x here=%v", err)
-		tx.Rollback()
+		_ = tx.Rollback()
 		return err
 	}
 
-	// Confirmar la transacción
 	err = tx.Commit()
 	if err != nil {
 		return err
