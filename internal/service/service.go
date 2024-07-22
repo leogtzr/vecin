@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"time"
 	"vecin/internal/config"
@@ -117,10 +118,17 @@ func (s *Service) SaveUser(signUpFormData model.SignUpFormData, token string) er
 		return err
 	}
 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(signUpFormData.Password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Printf("Error hashing password: %v", err)
+		_ = tx.Rollback()
+		return err
+	}
+
 	// Save the user
 	var userID int
 	err = tx.QueryRow("INSERT INTO usuario (username, nombre, apellido, telefono, email, password_hash, activo) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING usuario_id",
-		signUpFormData.Username, signUpFormData.Nombre, signUpFormData.Apellido, signUpFormData.Telefono, signUpFormData.Email, signUpFormData.Password, false).Scan(&userID)
+		signUpFormData.Username, signUpFormData.Nombre, signUpFormData.Apellido, signUpFormData.Telefono, signUpFormData.Email, string(hashedPassword), false).Scan(&userID)
 	if err != nil {
 		log.Printf("debug:x error inserting user (table:usuario): %v", err)
 		_ = tx.Rollback()
