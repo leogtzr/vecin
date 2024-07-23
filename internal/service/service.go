@@ -31,7 +31,8 @@ func (s *Service) GenerateToken() (string, error) {
 	return hex.EncodeToString(bytes), nil
 }
 
-func (s *Service) CalculateExpiry(duration time.Duration) time.Time {
+// Note to myself: not used right now, might want to remove it...
+func (s *Service) calculateExpiry(duration time.Duration) time.Time {
 	return time.Now().Add(duration)
 }
 
@@ -150,14 +151,4 @@ func (s *Service) SaveUser(signUpFormData model.SignUpFormData, token string) er
 	}
 
 	return nil
-}
-
-func (s *Service) CheckEmail(email string) (bool, error) {
-	exists, err := s.dao.UserExistsByEmail(email)
-	if err != nil {
-		log.Printf("debug:x error: (%s)", err)
-		return false, err
-	}
-
-	return exists, nil
 }

@@ -1491,6 +1491,33 @@ func writePasswordDoNotMatchToResponse(w http.ResponseWriter) {
 	_ = json.NewEncoder(w).Encode(map[string]string{"message": "passwords do not match"})
 }
 
+func isLoggedIn(r *http.Request) bool {
+	session, err := middleware.GetSessionStore().Get(r, "session")
+	if err != nil {
+		return false
+	}
+
+	userID, ok := session.Values["user_id"]
+	if !ok || userID == nil {
+		return false
+	}
+
+	return true
+}
+
+func LoginPage(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
+	// Check if the user is already logged in, if it is then redirect to the dashboard.
+	loggedIn := isLoggedIn(r)
+	if loggedIn {
+		log.Printf("debug:x user is logged in, redirecting to dashboard")
+		redirectToDashboard(w)
+
+		return
+	}
+
+	redirectLoginPage(w)
+}
+
 func CheckEmail(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	type CheckEmailRequest struct {
 		Email string `json:"email"`
@@ -1518,31 +1545,4 @@ func CheckEmail(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(CheckEmailResponse{
 		Exists: exists,
 	})
-}
-
-func isLoggedIn(r *http.Request) bool {
-	session, err := middleware.GetSessionStore().Get(r, "session")
-	if err != nil {
-		return false
-	}
-
-	userID, ok := session.Values["user_id"]
-	if !ok || userID == nil {
-		return false
-	}
-
-	return true
-}
-
-func LoginPage(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
-	// Check if the user is already logged in, if it is then redirect to the dashboard.
-	loggedIn := isLoggedIn(r)
-	if loggedIn {
-		log.Printf("debug:x user is logged in, redirecting to dashboard")
-		redirectToDashboard(w)
-
-		return
-	}
-
-	redirectLoginPage(w)
 }

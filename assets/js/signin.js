@@ -16,7 +16,7 @@ $(document).ready(function() {
                 console.log('OK');
                 console.log(response);
 
-                window.location.href = '/landing';
+                window.location.href = '/dashboard';
             },
             error: function(xhr, status, error) {
                 console.log(status);

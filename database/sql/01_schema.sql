@@ -20,7 +20,8 @@ CREATE TABLE comunidad (
     direccion_estado VARCHAR(100),
     direccion_pais VARCHAR(100),
     tipo VARCHAR(50) NOT NULL CHECK (tipo IN ('Fraccionamiento', 'Edificio', 'Calle')),
-    modelo_suscripcion VARCHAR(20) NOT NULL CHECK (modelo_suscripcion IN ('Mensual', 'Bimestral', 'Anual'))
+    modelo_suscripcion VARCHAR(20) NOT NULL CHECK (modelo_suscripcion IN ('Mensual', 'Bimestral', 'Anual')),
+    usuario_registrante_id INT REFERENCES usuario(usuario_id) ON DELETE SET NULL
 );
 
 CREATE TABLE suscripcion (

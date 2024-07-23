@@ -26,6 +26,14 @@ type Routes []Router
 func createRoutes(svc *service.Service, dao *database.DAO, cfg *config.Config) *Routes {
 	routes := &Routes{
 		Router{
+			Name:   "Dashboard Page",
+			Method: "GET",
+			Path:   "/dashboard",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.DashboardPage(svc, w, r)
+			},
+		},
+		Router{
 			Name:        "IndexPage",
 			Method:      "GET",
 			Path:        "/",

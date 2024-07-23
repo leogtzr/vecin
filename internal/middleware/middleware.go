@@ -11,7 +11,7 @@ import (
 	"golang.org/x/time/rate"
 )
 
-var store = sessions.NewCookieStore([]byte("super-secret-key"))
+var store *sessions.CookieStore
 
 func init() {
 	err := godotenv.Load()
@@ -24,6 +24,7 @@ func init() {
 		log.Fatal("SESSION_KEY is not set in the environment variables")
 	}
 
+	// TODO: improve the store.
 	store = sessions.NewCookieStore([]byte(sessionKey))
 }
 
