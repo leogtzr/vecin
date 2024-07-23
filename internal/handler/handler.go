@@ -63,11 +63,6 @@ func addTemplateFiles(additionalFiles ...string) []string {
 	return append(templateHTMLFiles, additionalFiles...)
 }
 
-// ToDo: finish this...
-func isLoggedIn(r *http.Request) bool {
-	return false
-}
-
 // IndexPage renders the home or index page.
 // path: "/"
 func IndexPage(w http.ResponseWriter, r *http.Request) {
@@ -126,13 +121,26 @@ func Login(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	username := r.FormValue("username")
-	password := r.FormValue("password")
+	var credentials struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
 
-	user, err := (*dao).GetUserByUsername(username)
+	err := json.NewDecoder(r.Body).Decode(&credentials)
+	if err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	email := credentials.Email
+	password := credentials.Password
+
+	log.Printf("debug:x email: (%s), password: (%s)", email, password)
+
+	user, err := (*dao).GetUserByEmail(email)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			http.Error(w, "Usuario o contraseña incorrectos", http.StatusUnauthorized)
+			http.Error(w, "Email o contraseña incorrectos", http.StatusUnauthorized)
 			return
 		}
 		http.Error(w, "Error interno del servidor", http.StatusInternalServerError)
@@ -149,7 +157,13 @@ func Login(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	session.Values["user_id"] = user.ID
 	_ = session.Save(r, w)
 
-	http.Redirect(w, r, "/landing", http.StatusSeeOther)
+	log.Printf("debug:x login for (%s), OK", user.Email)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Login successful",
+	})
 }
 
 func redirectLoginPage(w http.ResponseWriter) {
@@ -1506,10 +1520,25 @@ func CheckEmail(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func isLoggedIn(r *http.Request) bool {
+	session, err := middleware.GetSessionStore().Get(r, "session")
+	if err != nil {
+		return false
+	}
+
+	userID, ok := session.Values["user_id"]
+	if !ok || userID == nil {
+		return false
+	}
+
+	return true
+}
+
 func LoginPage(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	// Check if the user is already logged in, if it is then redirect to the dashboard.
 	loggedIn := isLoggedIn(r)
 	if loggedIn {
+		log.Printf("debug:x user is logged in, redirecting to dashboard")
 		redirectToDashboard(w)
 
 		return

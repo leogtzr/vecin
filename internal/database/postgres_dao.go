@@ -85,9 +85,13 @@ func (dao *daoImpl) GetUserByEmail(email string) (*model.Usuario, error) {
 	var user model.Usuario
 	err := row.Scan(&user.ID, &user.Username, &user.Nombre, &user.Apellido, &user.Telefono, &user.Email, &user.HashContrasena, &user.Activo)
 	if err != nil {
+		log.Printf("debug:x error=(%v)", err)
 		if errors.Is(err, sql.ErrNoRows) {
+			log.Printf("debug:x error 1")
 			return nil, err
 		}
+
+		log.Printf("debug:x error 2")
 		return nil, err
 	}
 
