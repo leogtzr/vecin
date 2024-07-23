@@ -141,8 +141,39 @@ func (dao *daoImpl) SaveCommunity(data model.RegisterFormData) (int, error) {
 	return comunidadID, nil
 }
 
+// TODO: check what is going on here.
 func (dao *daoImpl) SaveUser(data model.SignUpFormData) (int, error) {
 	return -1, nil
+}
+
+func (dao *daoImpl) HasRegisteredAFracc(userID int) (bool, error) {
+	query := `SELECT COUNT(*) FROM comunidad WHERE usuario_registrante_id = $1`
+
+	var count int
+	if err := dao.db.QueryRow(query, userID).Scan(&count); err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
+func (dao *daoImpl) IsPartOfComunidad(userID int) (bool, error) {
+	query := `
+        SELECT COUNT(*)
+        FROM habitante
+        WHERE email = (
+            SELECT email
+            FROM usuario
+            WHERE usuario_id = $1
+        )
+    `
+
+	var count int
+	if err := dao.db.QueryRow(query, userID).Scan(&count); err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
 }
 
 func (dao *daoImpl) DB() *sql.DB {

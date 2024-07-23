@@ -13,6 +13,8 @@ type DAO interface {
 	GetUserByEmail(email string) (*model.Usuario, error)
 	SaveCommunity(data model.RegisterFormData) (int, error)
 	UserExistsByEmail(email string) (bool, error)
+	HasRegisteredAFracc(userID int) (bool, error)
+	IsPartOfComunidad(userID int) (bool, error)
 	DB() *sql.DB
 }
 

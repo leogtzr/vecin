@@ -1,10 +1,9 @@
 package handler
 
 import (
-	"html/template"
 	"log"
 	"net/http"
-	"time"
+	"vecin/internal/middleware"
 	"vecin/internal/service"
 )
 
@@ -12,34 +11,40 @@ func DashboardPage(svc *service.Service, w http.ResponseWriter, r *http.Request)
 	// Check if the user is logged in:
 	if loggedIn := isLoggedIn(r); !loggedIn {
 		log.Print("debug:x DashboardPage, user is not logged in, redirecting to login page")
+		// dev-note:bypass the following two lines to show the dashboard and check.
 		//redirectLoginPage(w)
 		//return
 	}
 
-	// Verificar si el usuario ha registrado un fraccionamiento
-	// Verificar si el usuario está unido a un fraccionamiento
+	session, err := middleware.GetSessionStore().Get(r, "session")
+	if err != nil || session.Values["user_id"] == nil {
+		// If not logged in, redirect to the login page:
+		redirectLoginPage(w)
+
+		return
+	}
+
+	userID := session.Values["user_id"].(int)
+
+	// 1) Verificar si el usuario ha registrado un fraccionamiento
+	// 2) Verificar si el usuario está unido a un fraccionamiento
+	registered, err := svc.ShouldShowWelcomePageIfNotRegistered(userID)
+	if err != nil {
+		log.Printf("error checking if the user is registered before showing welcome page: %v", err)
+		redirectToWelcomePage(w)
+
+		return
+	}
+
+	log.Printf("debug:x registered user is: %v", registered)
+
+	if !registered {
+		redirectToWelcomePage(w)
+
+		return
+	}
 
 	log.Println("DashboardPage")
 
-	pageVariables := PageVariables{
-		Year:    time.Now().Format("2006"),
-		AppName: "Vecin",
-	}
-
-	tmpl, err := template.ParseFiles(
-		addTemplateFiles("internal/template/welcome.html")...,
-	)
-	if err != nil {
-		log.Printf("Error parsing templates: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	err = tmpl.ExecuteTemplate(w, "base", pageVariables)
-	if err != nil {
-		log.Printf("Error executing template: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
+	redirectToDashboard(w)
 }

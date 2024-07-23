@@ -152,6 +152,7 @@ func Login(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: put the following in a function, for God sake...
 	store := middleware.GetSessionStore()
 	session, _ := store.Get(r, "session")
 	session.Values["user_id"] = user.ID
@@ -191,7 +192,31 @@ func redirectLoginPage(w http.ResponseWriter) {
 	}
 }
 
+func redirectToWelcomePage(w http.ResponseWriter) {
+	pageVariables := PageVariables{
+		Year:    time.Now().Format("2006"),
+		AppName: "Vecin",
+	}
+
+	tmpl, err := template.ParseFiles(
+		addTemplateFiles("internal/template/welcome.html")...,
+	)
+	if err != nil {
+		log.Printf("Error parsing templates: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.ExecuteTemplate(w, "base", pageVariables)
+	if err != nil {
+		log.Printf("Error executing template: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+}
+
 // If the user is already logged in, we will redirect to the dashboard.
+// Ya sabemos que el usuario está registrado, así que mostramos el dashboard.
 func redirectToDashboard(w http.ResponseWriter) {
 	// templatePath := getTemplatePath("dashboard.html")
 }
