@@ -7,6 +7,17 @@ import (
 	"vecin/internal/service"
 )
 
+func getUserIDFromSession(r *http.Request) (int, error) {
+	session, err := middleware.GetSessionStore().Get(r, "session")
+	if err != nil || session.Values["user_id"] == nil {
+		return -1, err
+	}
+
+	userID := session.Values["user_id"].(int)
+
+	return userID, nil
+}
+
 func DashboardPage(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	// Check if the user is logged in:
 	if loggedIn := isLoggedIn(r); !loggedIn {

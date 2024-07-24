@@ -11,7 +11,7 @@ type DAO interface {
 	Ping() error
 	GetUserByUsername(username string) (*model.Usuario, error)
 	GetUserByEmail(email string) (*model.Usuario, error)
-	SaveCommunity(data model.RegisterFormData) (int, error)
+	SaveCommunity(data model.RegisterFormData, userID int) (int, error)
 	UserExistsByEmail(email string) (bool, error)
 	HasRegisteredAFracc(userID int) (bool, error)
 	IsPartOfComunidad(userID int) (bool, error)

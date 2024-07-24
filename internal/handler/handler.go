@@ -1325,7 +1325,8 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 
 func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		redirectLoginPage(w)
+
 		return
 	}
 
@@ -1340,8 +1341,20 @@ func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request
 
 	log.Printf("Form Data: %v", formData)
 
+	userID, err := getUserIDFromSession(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		resp := map[string]string{
+			"message": "Unauthorized",
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(resp)
+
+		return
+	}
+
 	// Save the data:
-	comunidadID, err := (*dao).SaveCommunity(formData)
+	comunidadID, err := (*dao).SaveCommunity(formData, userID)
 	// TODO: fix this...
 
 	w.WriteHeader(http.StatusOK)

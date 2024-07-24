@@ -113,15 +113,25 @@ func (dao *daoImpl) UserExistsByEmail(email string) (bool, error) {
 	return true, nil
 }
 
-// SaveCommunity saves a comunity into the database.
-func (dao *daoImpl) SaveCommunity(data model.RegisterFormData) (int, error) {
+// SaveCommunity saves a community into the database.
+func (dao *daoImpl) SaveCommunity(data model.RegisterFormData, userID int) (int, error) {
 	var comunidadID int
 	var err error
 
 	err = dao.db.QueryRow(`
-        INSERT INTO comunidad (nombre, direccion_calle, direccion_numero, direccion_colonia, direccion_cp, direccion_ciudad, direccion_estado, direccion_pais, tipo, modelo_suscripcion)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING comunidad_id
-    `,
+        INSERT INTO comunidad (
+				   nombre, 
+				   direccion_calle, 
+				   direccion_numero, 
+				   direccion_colonia, 
+				   direccion_cp, 
+				   direccion_ciudad, 
+				   direccion_estado, 
+				   direccion_pais, 
+				   tipo, 
+				   modelo_suscripcion, 
+				   usuario_registrante_id
+	   ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING comunidad_id`,
 		data.NombreComunidad,
 		data.DireccionCalle,
 		data.DireccionNumero,
@@ -131,7 +141,9 @@ func (dao *daoImpl) SaveCommunity(data model.RegisterFormData) (int, error) {
 		data.DireccionEstado,
 		data.DireccionPais,
 		data.TipoComunidad,
-		data.ModeloSuscripcion).Scan(&comunidadID)
+		data.ModeloSuscripcion,
+		userID,
+	).Scan(&comunidadID)
 	if err != nil {
 		return -1, err
 	}
