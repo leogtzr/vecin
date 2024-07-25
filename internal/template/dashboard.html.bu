@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Vecin</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/app.css" />
+    <style>
+        .action-panel {
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            height: calc(100vh - 56px - 58px); /* Ajustado para el footer */
+        }
+        .fraccionamiento-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .fraccionamiento-details {
+            margin-top: 20px;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Vecin</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/perfil">Mi Perfil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Cerrar Sesión</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Panel de acciones (izquierda) -->
+            <div class="col-md-3 action-panel py-3">
+                <h4 class="mb-4">Acciones</h4>
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action" id="registrarFraccionamiento">Registrar Nuevo Fraccionamiento</a>
+                    <a href="#" class="list-group-item list-group-item-action" id="gestionarHabitantes">Gestionar Habitantes</a>
+                    <a href="#" class="list-group-item list-group-item-action" id="crearAnuncio">Crear Anuncio</a>
+                    <a href="#" class="list-group-item list-group-item-action" id="programarJunta">Programar Junta</a>
+                    <a href="#" class="list-group-item list-group-item-action" id="gestionarCuotas">Gestionar Cuotas</a>
+                </div>
+            </div>
+
+            <!-- Contenido principal (derecha) -->
+            <div class="col-md-9 py-3">
+                <!-- Vista para administrador de fraccionamientos -->
+                <div id="adminView">
+                    <h2 class="mb-4">Mis Fraccionamientos</h2>
+                    <div class="fraccionamiento-list mb-4">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Tipo</th>
+                                    <th>Ciudad</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Fraccionamiento Las Palmas</td>
+                                    <td>Fraccionamiento</td>
+                                    <td>Guadalajara</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info">Editar</button>
+                                        <button class="btn btn-sm btn-danger">Eliminar</button>
+                                    </td>
+                                </tr>
+                                <!-- Más filas de fraccionamientos aquí -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="fraccionamiento-details">
+                        <h3>Detalles del Fraccionamiento</h3>
+                        <form>
+                            <div class="form-group">
+                                <label for="nombreFraccionamiento">Nombre</label>
+                                <input type="text" class="form-control" id="nombreFraccionamiento" value="Fraccionamiento Las Palmas" readonly>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="tipoFraccionamiento">Tipo</label>
+                                    <input type="text" class="form-control" id="tipoFraccionamiento" value="Fraccionamiento" readonly>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="modeloSuscripcion">Modelo de Suscripción</label>
+                                    <input type="text" class="form-control" id="modeloSuscripcion" value="Mensual" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="direccionCalle">Calle</label>
+                                    <input type="text" class="form-control" id="direccionCalle" value="Av. Principal" readonly>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="direccionNumero">Número</label>
+                                    <input type="text" class="form-control" id="direccionNumero" value="123" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label for="direccionColonia">Colonia</label>
+                                    <input type="text" class="form-control" id="direccionColonia" value="Las Palmas" readonly>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="direccionCP">Código Postal</label>
+                                    <input type="text" class="form-control" id="direccionCP" value="44000" readonly>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="direccionCiudad">Ciudad</label>
+                                    <input type="text" class="form-control" id="direccionCiudad" value="Guadalajara" readonly>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Vista para habitante de fraccionamiento -->
+                <div id="habitanteView" style="display: none;">
+                    <!-- ... (contenido de la vista de habitante, sin cambios) ... -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer home-footer py-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-6 text-left text-white">
+                    ABC: <span id="someId">DEF</span>
+                </div>
+                <div class="col-6 text-right text-white">
+                    © 2024 Vecin
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/assets/js/dashboard.js"></script>
+</body>
+</html>

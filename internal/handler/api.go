@@ -8,10 +8,11 @@ import (
 	"net/http"
 	"vecin/internal/config"
 	model "vecin/internal/model/geonames"
+	"vecin/internal/service"
 )
 
 // GetRegionNameFromGeoNames calls GeoNames API to get a state or city information.
-// path: "/api/region"
+// path: "/fraccionamientos/region"
 func GetRegionNameFromGeoNames(w http.ResponseWriter, r *http.Request, cfg *config.Config) {
 	geoNameId := r.URL.Query().Get("geonameId")
 
@@ -50,4 +51,23 @@ func GetRegionNameFromGeoNames(w http.ResponseWriter, r *http.Request, cfg *conf
 
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(geoNamesResponse)
+}
+
+func GetFraccionamientos(svc *service.Service, w http.ResponseWriter, r *http.Request, cfg *config.Config) {
+	userID, err := getUserIDFromSession(r)
+	if err != nil {
+		log.Printf("Error al getUserIDFromSession for %d id: %v\n", userID, err)
+		writeUnauthorized(w)
+		return
+	}
+
+	fraccionamientos, err := svc.GetFraccionamientos(userID)
+	if err != nil {
+		log.Printf("Error al obtener fraccionamientos for %d id, error: %v\n", userID, err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(fraccionamientos)
 }

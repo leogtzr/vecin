@@ -40,6 +40,14 @@ func createRoutes(svc *service.Service, dao *database.DAO, cfg *config.Config) *
 			HandlerFunc: handler.IndexPage,
 		},
 		Router{
+			Name:   "API - obtener fraccionamientos/comunidades",
+			Method: "GET",
+			Path:   "/api/fraccionamientos",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.GetFraccionamientos(svc, w, r, cfg)
+			},
+		},
+		Router{
 			Name:   "API - obtener los estados de un país",
 			Method: "GET",
 			Path:   "/api/region",

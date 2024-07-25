@@ -60,11 +60,11 @@ func NewConfig() (*Config, error) {
 	}
 
 	if config.MailSenderApiKey == "" {
-		return nil, fmt.Errorf("mail sender api key not set")
+		return nil, fmt.Errorf("mail sender fraccionamientos key not set")
 	}
 
 	if config.Mailing.ApiKey == "" {
-		return nil, fmt.Errorf("mail sender api key not set")
+		return nil, fmt.Errorf("mail sender fraccionamientos key not set")
 	}
 
 	return config, nil

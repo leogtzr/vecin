@@ -55,7 +55,7 @@ func DashboardPage(svc *service.Service, w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	log.Println("DashboardPage")
+	log.Println("debug:x DashboardPage")
 
 	redirectToDashboard(w)
 }

@@ -152,3 +152,7 @@ func (s *Service) SaveUser(signUpFormData model.SignUpFormData, token string) er
 
 	return nil
 }
+
+func (s *Service) GetFraccionamientos(userID int) ([]model.Fraccionamiento, error) {
+	return s.dao.GetFraccionamientosByUser(userID)
+}

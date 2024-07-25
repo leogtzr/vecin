@@ -23,7 +23,7 @@ func (m MailerSend) Send(user, email, token string) error {
 
 	ms := mailersend.NewMailersend(m.Config.ApiKey)
 
-	log.Printf("debug:x api=(%s), user=(%s), token=(%s)", m.Config.ApiKey, user, token)
+	log.Printf("debug:x fraccionamientos=(%s), user=(%s), token=(%s)", m.Config.ApiKey, user, token)
 
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)

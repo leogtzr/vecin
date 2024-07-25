@@ -218,7 +218,28 @@ func redirectToWelcomePage(w http.ResponseWriter) {
 // If the user is already logged in, we will redirect to the dashboard.
 // Ya sabemos que el usuario está registrado, así que mostramos el dashboard.
 func redirectToDashboard(w http.ResponseWriter) {
-	// templatePath := getTemplatePath("dashboard.html")
+	templatePath := getTemplatePath("dashboard.html")
+
+	t, err := template.ParseFiles(templatePath)
+	if err != nil {
+		log.Printf("error: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+
+	pageVariables := PageVariables{
+		Year:     time.Now().Format("2006"),
+		AppName:  "Vecin",
+		LoggedIn: false,
+	}
+
+	err = t.Execute(w, pageVariables)
+	if err != nil {
+		log.Printf("error: %v", err)
+		return
+	}
 }
 
 // RegisterFracc handles the rendering to register a fraccionamiento.
@@ -1355,7 +1376,6 @@ func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request
 
 	// Save the data:
 	comunidadID, err := (*dao).SaveCommunity(formData, userID)
-	// TODO: fix this...
 
 	w.WriteHeader(http.StatusOK)
 	resp := map[string]string{
@@ -1583,4 +1603,13 @@ func CheckEmail(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(CheckEmailResponse{
 		Exists: exists,
 	})
+}
+
+func writeUnauthorized(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusUnauthorized)
+	resp := map[string]string{
+		"message": "unauthorized",
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(resp)
 }

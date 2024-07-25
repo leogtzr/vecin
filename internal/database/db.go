@@ -15,6 +15,7 @@ type DAO interface {
 	UserExistsByEmail(email string) (bool, error)
 	HasRegisteredAFracc(userID int) (bool, error)
 	IsPartOfComunidad(userID int) (bool, error)
+	GetFraccionamientosByUser(userID int) ([]model.Fraccionamiento, error)
 	DB() *sql.DB
 }
 
