@@ -15,7 +15,7 @@ $(document).ready(function() {
                     console.log(fraccionamiento);
                     console.log('debug:x end');
                     tableBody.append(`
-                        <tr data-id="${fraccionamiento.comunidad_id}">
+                        <tr data-id="${fraccionamiento.community_id}">
                             <td>${fraccionamiento.name}</td>
                             <td>${fraccionamiento.tipo}</td>
                             <td>${fraccionamiento.direccion_estado}</td>
@@ -40,7 +40,9 @@ $(document).ready(function() {
             url: `/api/fraccionamientos/${id}`,
             type: 'GET',
             success: function(fraccionamiento) {
-                $('#nombreFraccionamiento').val(fraccionamiento.nombre);
+                console.log('debug:x got:');
+                console.log(fraccionamiento);
+                $('#nombreFraccionamiento').val(fraccionamiento.name);
                 $('#tipoFraccionamiento').val(fraccionamiento.tipo);
                 $('#modeloSuscripcion').val(fraccionamiento.modelo_suscripcion);
                 $('#direccionCalle').val(fraccionamiento.direccion_calle);
@@ -61,7 +63,11 @@ $(document).ready(function() {
 
     // Evento para editar fraccionamiento
     $(document).on('click', '.edit-btn', function() {
-        selectedFraccionamientoId = $(this).closest('tr').data('id');
+        const row = $(this).closest('tr');
+        selectedFraccionamientoId = row.data('id');
+        console.log('Selected row data-id: ' + row.data('id'));
+        console.log('Selected fraccionamiento ID: ' + selectedFraccionamientoId);
+
         loadFraccionamientoDetails(selectedFraccionamientoId);
     });
 

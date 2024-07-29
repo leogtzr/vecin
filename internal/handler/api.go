@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"io"
 	"log"
 	"net/http"
@@ -53,7 +54,7 @@ func GetRegionNameFromGeoNames(w http.ResponseWriter, r *http.Request, cfg *conf
 	_ = json.NewEncoder(w).Encode(geoNamesResponse)
 }
 
-func GetFraccionamientos(svc *service.Service, w http.ResponseWriter, r *http.Request, cfg *config.Config) {
+func GetFraccionamientos(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	userID, err := getUserIDFromSession(r)
 	if err != nil {
 		log.Printf("Error al getUserIDFromSession for %d id: %v\n", userID, err)
@@ -70,4 +71,41 @@ func GetFraccionamientos(svc *service.Service, w http.ResponseWriter, r *http.Re
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(fraccionamientos)
+}
+
+type ErrorResponse struct {
+	Message string `json:"message"`
+}
+
+func writeErrorResponse(w http.ResponseWriter, statusCode int, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	response := ErrorResponse{Message: message}
+	_ = json.NewEncoder(w).Encode(response)
+}
+
+func GetFraccionamientoByID(svc *service.Service, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	communityID := vars["id"]
+
+	log.Printf("debug:x id: (%s)", communityID)
+	fraccionamiento, err := svc.GetFraccionamientoDetail(communityID)
+	if err != nil {
+		log.Printf("Error al obtener detalles de fraccionamiento para el ID %d: %v\n", communityID, err)
+		writeErrorResponse(w, http.StatusInternalServerError, "No se pudieron obtener los fraccionamientos")
+		return
+	}
+	//userConfirmedAccount, err := svc.ConfirmAccount(token)
+	//if err != nil {
+	//	log.Printf("error: %v", err)
+	//	redirectAccountActivationProblem(w)
+	//
+	//	return
+	//}
+	//
+	//redirectAccountActivated(userConfirmedAccount, w)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(fraccionamiento)
 }

@@ -44,7 +44,15 @@ func createRoutes(svc *service.Service, dao *database.DAO, cfg *config.Config) *
 			Method: "GET",
 			Path:   "/api/fraccionamientos",
 			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
-				handler.GetFraccionamientos(svc, w, r, cfg)
+				handler.GetFraccionamientos(svc, w, r)
+			},
+		},
+		Router{
+			Name:   "API - obtener la información de un fraccionamiento",
+			Method: "GET",
+			Path:   "/api/fraccionamientos/{id}",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.GetFraccionamientoByID(svc, w, r)
 			},
 		},
 		Router{

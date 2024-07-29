@@ -16,6 +16,7 @@ type DAO interface {
 	HasRegisteredAFracc(userID int) (bool, error)
 	IsPartOfComunidad(userID int) (bool, error)
 	GetFraccionamientosByUser(userID int) ([]model.Fraccionamiento, error)
+	GetFraccionamientoDetailsByCommunityID(id string) (model.Fraccionamiento, error)
 	DB() *sql.DB
 }
 

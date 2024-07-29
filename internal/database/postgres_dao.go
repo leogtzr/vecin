@@ -108,7 +108,8 @@ func (dao *daoImpl) GetFraccionamientosByUser(userID int) ([]model.Fraccionamien
        			direccion_ciudad, 
        			direccion_estado, 
        			direccion_pais,
-       			tipo
+       			tipo,
+       			modelo_suscripcion
        FROM comunidad WHERE usuario_registrante_id = $1`
 	rows, err := dao.db.Query(query, userID)
 	if err != nil {
@@ -126,13 +127,49 @@ func (dao *daoImpl) GetFraccionamientosByUser(userID int) ([]model.Fraccionamien
 		var fracc model.Fraccionamiento
 		if err := rows.Scan(&fracc.CommunityID, &fracc.Name, &fracc.DireccionCalle,
 			&fracc.DireccionNumero, &fracc.DireccionColonia, &fracc.DireccionCP, &fracc.DireccionEstado,
-			&fracc.DireccionCiudad, &fracc.DireccionPais, &fracc.Tipo); err != nil {
+			&fracc.DireccionCiudad, &fracc.DireccionPais, &fracc.Tipo, &fracc.ModeloSuscripcion); err != nil {
 			return []model.Fraccionamiento{}, err
 		}
 		fraccionamientos = append(fraccionamientos, fracc)
 	}
 
 	return fraccionamientos, nil
+}
+
+func (dao *daoImpl) GetFraccionamientoDetailsByCommunityID(communityID string) (model.Fraccionamiento, error) {
+	query := `SELECT comunidad_id, 
+       			nombre,
+       			direccion_calle, 
+       			direccion_numero, 
+       			direccion_colonia, 
+       			direccion_cp, 
+       			direccion_ciudad, 
+       			direccion_estado, 
+       			direccion_pais,
+       			tipo,
+       			modelo_suscripcion
+       FROM comunidad WHERE comunidad_id = $1`
+	rows, err := dao.db.Query(query, communityID)
+	if err != nil {
+		return model.Fraccionamiento{}, err
+	}
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}(rows)
+
+	var fracc model.Fraccionamiento
+	if rows.Next() {
+		if err := rows.Scan(&fracc.CommunityID, &fracc.Name, &fracc.DireccionCalle,
+			&fracc.DireccionNumero, &fracc.DireccionColonia, &fracc.DireccionCP, &fracc.DireccionEstado,
+			&fracc.DireccionCiudad, &fracc.DireccionPais, &fracc.Tipo, &fracc.ModeloSuscripcion); err != nil {
+			return model.Fraccionamiento{}, err
+		}
+	}
+
+	return fracc, nil
 }
 
 func (dao *daoImpl) UserExistsByEmail(email string) (bool, error) {
