@@ -21,8 +21,8 @@ $(document).ready(function() {
                             <td>${fraccionamiento.direccion_estado}</td>
                             <td>${fraccionamiento.direccion_ciudad}</td>
                             <td>
-                                <button class="btn btn-sm btn-info edit-btn">Editar</button>
-                                <button class="btn btn-sm btn-danger delete-btn">Eliminar</button>
+                                <button class="btn btn-sm btn-info edit-btn">Editar ✏️</button>
+                                <button class="btn btn-sm btn-danger delete-btn">Eliminar 🗑</button>
                             </td>
                         </tr>
                     `);
