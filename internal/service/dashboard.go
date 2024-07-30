@@ -1,6 +1,9 @@
 package service
 
-import "log"
+import (
+	"log"
+	"vecin/internal/model"
+)
 
 // La ventana de bienvenida debería mostrarse cuando el usuario no ha registrado un fraccionamiento (como el que paga $$)
 // O no se ha unido a un fraccionamiento existente.
@@ -20,4 +23,13 @@ func (s *Service) ShouldShowWelcomePageIfNotRegistered(userID int) (bool, error)
 	log.Printf("debug:x HasRegisteredAFracc=%v, IsPartOfComunidad=%v, userID=%d", hasRegistered, isPartOf, userID)
 
 	return hasRegistered || isPartOf, nil
+}
+
+func (s *Service) UpdateFracc(communityID int, data model.FraccionamientoFormData) error {
+	_, err := s.dao.UpdateCommunity(data, communityID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

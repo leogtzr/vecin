@@ -88,7 +88,7 @@ func createRoutes(svc *service.Service, dao *database.DAO, cfg *config.Config) *
 			Method: "PUT",
 			Path:   "/api/fraccionamientos/{communityID}",
 			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
-				handler.UpdateFracc(dao, w, r)
+				handler.UpdateFracc(svc, w, r)
 			},
 		},
 		Router{

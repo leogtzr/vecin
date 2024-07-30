@@ -41,9 +41,19 @@ $(document).ready(function() {
         $('#direccionCP').prop('readonly', false);
         $('#referencias').prop('readonly', false);
         $('#descripcion').prop('readonly', false);
-        //$('.fraccionamiento-details input').prop('readonly', false);
-        //$('#referencias').prop('readonly', false);
-        //$('#descripcion').prop('readonly', false);
+        $('#direccionCalle').prop('readonly', false);
+        // TODO: might need to add more elements here...
+    }
+
+    function disableComponentsForEdition() {
+        $('#nombreFraccionamiento').prop('readonly', true);
+        $('#modeloSuscripcion').prop('readonly', true);
+        $('#direccionColonia').prop('readonly', true);
+        $('#direccionCP').prop('readonly', true);
+        $('#referencias').prop('readonly', true);
+        $('#descripcion').prop('readonly', true);
+        $('#direccionCalle').prop('readonly', true);
+        // TODO: might need to add more elements here...
     }
 
     // Cargar detalles de fraccionamiento
@@ -80,12 +90,14 @@ $(document).ready(function() {
                 $('#referencias').val(fraccionamiento.referencias);
                 $('#descripcion').val(fraccionamiento.descripcion);
 
-                // Habilitar edición
+                // Habilitar edición:
                 enableComponentsForEdition();
 
                 $('#saveFraccionamiento').show();
+                $('#cancelSaveFraccionamiento').show();
             },
             error: function(xhr, status, error) {
+                // TODO: improve this:
                 alert('Error al cargar detalles del fraccionamiento: ' + error);
             }
         });
@@ -99,6 +111,12 @@ $(document).ready(function() {
         console.log('Selected fraccionamiento ID: ' + selectedFraccionamientoId);
 
         loadFraccionamientoDetails(selectedFraccionamientoId);
+    });
+
+    $('#cancelSaveFraccionamiento').on('click', function() {
+        disableComponentsForEdition();
+        $('#saveFraccionamiento').hide();
+        $('#cancelSaveFraccionamiento').hide();
     });
 
     // Guardar cambios del fraccionamiento
@@ -126,12 +144,15 @@ $(document).ready(function() {
             contentType: 'application/json',
             data: JSON.stringify(fraccionamientoData),
             success: function(response) {
+                console.log(response);
                 alert('Fraccionamiento actualizado con éxito');
                 loadFraccionamientos();
-                $('.fraccionamiento-details input').prop('readonly', true);
+                disableComponentsForEdition();
                 $('#saveFraccionamiento').hide();
+                $('#cancelSaveFraccionamiento').hide();
             },
             error: function(xhr, status, error) {
+                // TODO: improve this:
                 alert('Error al actualizar fraccionamiento: ' + error);
             }
         });
@@ -149,6 +170,7 @@ $(document).ready(function() {
                     loadFraccionamientos();
                 },
                 error: function(xhr, status, error) {
+                    // TODO: improve this:
                     alert('Error al eliminar fraccionamiento: ' + error);
                 }
             });

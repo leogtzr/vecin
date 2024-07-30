@@ -192,7 +192,7 @@ func (dao *daoImpl) UserExistsByEmail(email string) (bool, error) {
 }
 
 // SaveCommunity saves a community into the database.
-func (dao *daoImpl) SaveCommunity(data model.RegisterFormData, userID int) (int, error) {
+func (dao *daoImpl) SaveCommunity(data model.FraccionamientoFormData, userID int) (int, error) {
 	var comunidadID int
 	var err error
 
@@ -237,6 +237,52 @@ func (dao *daoImpl) SaveCommunity(data model.RegisterFormData, userID int) (int,
 	return comunidadID, nil
 }
 
+func (dao *daoImpl) UpdateCommunity(data model.FraccionamientoFormData, communityID int) (int, error) {
+	tx, err := dao.DB().Begin()
+	if err != nil {
+		log.Printf("debug:x error: (%s), error al iniciar tx", err.Error())
+		return communityID, err
+	}
+
+	_, err = tx.Exec(`
+			UPDATE comunidad 
+			SET nombre = $1, 
+			    tipo = $2, 
+			    modelo_suscripcion = $3, 
+			    direccion_calle = $4, 
+			    direccion_numero = $5, 
+			    direccion_colonia = $6, 
+			    direccion_cp = $7, 
+			    direccion_ciudad = $8,
+			    referencias = $9,
+			    descripcion = $10
+			WHERE comunidad_id = $11
+		`,
+		data.NombreComunidad,
+		data.TipoComunidad,
+		data.ModeloSuscripcion,
+		data.DireccionCalle,
+		data.DireccionNumero,
+		data.DireccionColonia,
+		data.DireccionCodigoPostal,
+		data.DireccionCiudad,
+		data.Referencias,
+		data.Descripcion,
+		communityID)
+	if err != nil {
+		log.Printf("dao: error updating comunidad (%d): %v", communityID, err)
+		_ = tx.Rollback()
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Printf("dao: error commiting tx to update comunidad (%d): %v", communityID, err)
+
+		return communityID, err
+	}
+
+	return communityID, nil
+}
+
 // TODO: check what is going on here.
 func (dao *daoImpl) SaveUser(data model.SignUpFormData) (int, error) {
 	return -1, nil
@@ -277,7 +323,7 @@ func (dao *daoImpl) DB() *sql.DB {
 }
 
 /*
-func (dao *daoImpl) SaveCommunity(data model.RegisterFormData) (int, error) {
+func (dao *daoImpl) SaveCommunity(data model.FraccionamientoFormData) (int, error) {
 	var comunidadID int
 	var suscripcionID int
 	var pagoID int

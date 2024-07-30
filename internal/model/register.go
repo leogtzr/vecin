@@ -1,6 +1,6 @@
 package model
 
-type RegisterFormData struct {
+type FraccionamientoFormData struct {
 	NombreComunidad       string `json:"nombreComunidad"`
 	TipoComunidad         string `json:"tipoComunidad"`
 	ModeloSuscripcion     string `json:"modeloSuscripcion"`

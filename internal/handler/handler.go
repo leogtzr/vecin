@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"log"
@@ -86,7 +85,7 @@ func writeUnauthorized(w http.ResponseWriter) {
 	_ = json.NewEncoder(w).Encode(resp)
 }
 
-func writeErrorMessageWithStatusCode(w http.ResponseWriter, message string, statusCode int) {
+func writeMessageWithStatusCode(w http.ResponseWriter, message string, statusCode int) {
 	w.WriteHeader(statusCode)
 	resp := map[string]string{
 		"message": message,
@@ -294,7 +293,7 @@ func RegisterFracc(w http.ResponseWriter, r *http.Request) {
 		addTemplateFiles("internal/template/registrar_fraccionamiento.html")...,
 	)
 	if err != nil {
-		writeErrorMessageWithStatusCode(w, "Internal Server Error", http.StatusInternalServerError)
+		writeMessageWithStatusCode(w, "Internal Server Error", http.StatusInternalServerError)
 		log.Printf("Error parsing templates: %v", err)
 
 		return
@@ -303,7 +302,7 @@ func RegisterFracc(w http.ResponseWriter, r *http.Request) {
 	err = tmpl.ExecuteTemplate(w, "base", pageVariables)
 	if err != nil {
 		log.Printf("Error executing template: %v", err)
-		writeErrorMessageWithStatusCode(w, "Internal Server Error", http.StatusInternalServerError)
+		writeMessageWithStatusCode(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 }
@@ -1383,7 +1382,7 @@ func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	var formData model.RegisterFormData
+	var formData model.FraccionamientoFormData
 	err := json.NewDecoder(r.Body).Decode(&formData)
 	if err != nil {
 		log.Printf("Error parsing form: %v", err)
@@ -1629,29 +1628,4 @@ func CheckEmail(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(CheckEmailResponse{
 		Exists: exists,
 	})
-}
-
-func UpdateFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
-	if r.Method != "PUT" {
-		writeErrorMessageWithStatusCode(w, "method not allowed", http.StatusMethodNotAllowed)
-
-		return
-	}
-
-	vars := mux.Vars(r)
-	communityID := vars["communityID"]
-
-	log.Printf("debug:x fraccID=%s", communityID)
-
-	var formData model.RegisterFormData
-	err := json.NewDecoder(r.Body).Decode(&formData)
-	if err != nil {
-		log.Printf("Error parsing form: %v", err)
-		redirectToErrorPageWithMessageAndStatusCode(w, "Unable to process input data", http.StatusInternalServerError)
-
-		return
-	}
-
-	fmt.Println(formData)
-
 }

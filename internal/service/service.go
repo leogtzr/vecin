@@ -48,7 +48,7 @@ func (s *Service) ConfirmAccount(token string) (model.Usuario, error) {
 	}
 	defer func() {
 		if p := recover(); p != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 			// http.Error(w, "Error interno", http.StatusInternalServerError)
 			log.Printf("debug:x internal error")
 		}
