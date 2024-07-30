@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"log"
@@ -61,6 +62,37 @@ func getTemplatePath(templateFileName string) string {
 
 func addTemplateFiles(additionalFiles ...string) []string {
 	return append(templateHTMLFiles, additionalFiles...)
+}
+
+func writeErrorResponse(w http.ResponseWriter, statusCode int, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	response := ErrorResponse{Message: message}
+	_ = json.NewEncoder(w).Encode(response)
+}
+
+func writePasswordDoNotMatchToResponse(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusBadRequest)
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(map[string]string{"message": "passwords do not match"})
+}
+
+func writeUnauthorized(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusUnauthorized)
+	resp := map[string]string{
+		"message": "unauthorized",
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(resp)
+}
+
+func writeErrorMessageWithStatusCode(w http.ResponseWriter, message string, statusCode int) {
+	w.WriteHeader(statusCode)
+	resp := map[string]string{
+		"message": message,
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(resp)
 }
 
 // IndexPage renders the home or index page.
@@ -245,7 +277,6 @@ func redirectToDashboard(w http.ResponseWriter) {
 // RegisterFracc handles the rendering to register a fraccionamiento.
 // path: "/registrar-fraccionamiento"
 func RegisterFracc(w http.ResponseWriter, r *http.Request) {
-	// TODO:
 	// Verificar si el usuario no ha hecho login, si no mandar a hacer una cuenta.
 	loggedIn := isLoggedIn(r)
 	if !loggedIn {
@@ -263,15 +294,16 @@ func RegisterFracc(w http.ResponseWriter, r *http.Request) {
 		addTemplateFiles("internal/template/registrar_fraccionamiento.html")...,
 	)
 	if err != nil {
+		writeErrorMessageWithStatusCode(w, "Internal Server Error", http.StatusInternalServerError)
 		log.Printf("Error parsing templates: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+
 		return
 	}
 
 	err = tmpl.ExecuteTemplate(w, "base", pageVariables)
 	if err != nil {
 		log.Printf("Error executing template: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		writeErrorMessageWithStatusCode(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 }
@@ -1543,12 +1575,6 @@ func SignUp(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(resp)
 }
 
-func writePasswordDoNotMatchToResponse(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusBadRequest)
-	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(map[string]string{"message": "passwords do not match"})
-}
-
 func isLoggedIn(r *http.Request) bool {
 	session, err := middleware.GetSessionStore().Get(r, "session")
 	if err != nil {
@@ -1605,11 +1631,27 @@ func CheckEmail(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func writeUnauthorized(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusUnauthorized)
-	resp := map[string]string{
-		"message": "unauthorized",
+func UpdateFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
+	if r.Method != "PUT" {
+		writeErrorMessageWithStatusCode(w, "method not allowed", http.StatusMethodNotAllowed)
+
+		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(resp)
+
+	vars := mux.Vars(r)
+	communityID := vars["communityID"]
+
+	log.Printf("debug:x fraccID=%s", communityID)
+
+	var formData model.RegisterFormData
+	err := json.NewDecoder(r.Body).Decode(&formData)
+	if err != nil {
+		log.Printf("Error parsing form: %v", err)
+		redirectToErrorPageWithMessageAndStatusCode(w, "Unable to process input data", http.StatusInternalServerError)
+
+		return
+	}
+
+	fmt.Println(formData)
+
 }

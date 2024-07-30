@@ -58,6 +58,7 @@ func GetFraccionamientos(svc *service.Service, w http.ResponseWriter, r *http.Re
 	userID, err := getUserIDFromSession(r)
 	if err != nil {
 		log.Printf("Error al getUserIDFromSession for %d id: %v\n", userID, err)
+
 		writeUnauthorized(w)
 		return
 	}
@@ -77,18 +78,19 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
-func writeErrorResponse(w http.ResponseWriter, statusCode int, message string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	response := ErrorResponse{Message: message}
-	_ = json.NewEncoder(w).Encode(response)
-}
-
 func GetFraccionamientoByID(svc *service.Service, w http.ResponseWriter, r *http.Request) {
+	userID, err := getUserIDFromSession(r)
+	if err != nil {
+		log.Printf("(GetFraccionamientoByID) Error al getUserIDFromSession for %d id: %v\n", userID, err)
+		writeUnauthorized(w)
+
+		return
+	}
+
 	vars := mux.Vars(r)
 	communityID := vars["id"]
 
-	log.Printf("debug:x id: (%s)", communityID)
+	log.Printf("debug:x getting fracc details for id: (%s)", communityID)
 	fraccionamiento, err := svc.GetFraccionamientoDetail(communityID)
 	if err != nil {
 		log.Printf("Error al obtener detalles de fraccionamiento para el ID %d: %v\n", communityID, err)

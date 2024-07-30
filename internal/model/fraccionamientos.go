@@ -18,4 +18,6 @@ type Fraccionamiento struct {
 	DireccionPais     string `json:"direccion_pais"`
 	ModeloSuscripcion string `json:"modelo_suscripcion"`
 	Tipo              string `json:"tipo"`
+	Referencias       string `json:"referencias"`
+	Descripcion       string `json:"descripcion"`
 }

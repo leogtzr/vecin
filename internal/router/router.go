@@ -84,6 +84,14 @@ func createRoutes(svc *service.Service, dao *database.DAO, cfg *config.Config) *
 			},
 		},
 		Router{
+			Name:   "Form - Actualizar Fraccionamiento",
+			Method: "PUT",
+			Path:   "/api/fraccionamientos/{communityID}",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.UpdateFracc(dao, w, r)
+			},
+		},
+		Router{
 			Name:   "Registrar - Page",
 			Method: "GET",
 			Path:   "/registrar",
@@ -95,6 +103,7 @@ func createRoutes(svc *service.Service, dao *database.DAO, cfg *config.Config) *
 			Name:   "View Fraccs",
 			Method: "GET",
 			Path:   "/view-fraccs",
+			// TODO: redirigir finalmente a la página para ver los fraccionamientos registrados.
 			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				handler.ViewFraccsPage(dao, w, r)
 			},

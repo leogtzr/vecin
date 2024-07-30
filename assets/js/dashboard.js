@@ -34,6 +34,18 @@ $(document).ready(function() {
         });
     }
 
+    function enableComponentsForEdition() {
+        $('#nombreFraccionamiento').prop('readonly', false);
+        $('#modeloSuscripcion').prop('readonly', false);
+        $('#direccionColonia').prop('readonly', false);
+        $('#direccionCP').prop('readonly', false);
+        $('#referencias').prop('readonly', false);
+        $('#descripcion').prop('readonly', false);
+        //$('.fraccionamiento-details input').prop('readonly', false);
+        //$('#referencias').prop('readonly', false);
+        //$('#descripcion').prop('readonly', false);
+    }
+
     // Cargar detalles de fraccionamiento
     function loadFraccionamientoDetails(id) {
         $.ajax({
@@ -42,17 +54,35 @@ $(document).ready(function() {
             success: function(fraccionamiento) {
                 console.log('debug:x got:');
                 console.log(fraccionamiento);
+
+                var modeloSuscripcion = $('#modeloSuscripcion');
+
+                modeloSuscripcion.empty();
+                const opciones = ["Mensual", "Anual"];
+                opciones.forEach(function(opcion) {
+                    const optionElement = $('<option>', {
+                        value: opcion,
+                        text: opcion
+                    });
+                    modeloSuscripcion.append(optionElement);
+                });
+
+                modeloSuscripcion.val(fraccionamiento.modelo_suscripcion);
+
                 $('#nombreFraccionamiento').val(fraccionamiento.name);
                 $('#tipoFraccionamiento').val(fraccionamiento.tipo);
-                $('#modeloSuscripcion').val(fraccionamiento.modelo_suscripcion);
                 $('#direccionCalle').val(fraccionamiento.direccion_calle);
                 $('#direccionNumero').val(fraccionamiento.direccion_numero);
                 $('#direccionColonia').val(fraccionamiento.direccion_colonia);
                 $('#direccionCP').val(fraccionamiento.direccion_cp);
                 $('#direccionCiudad').val(fraccionamiento.direccion_ciudad);
+                $('#direccionEstado').val(fraccionamiento.direccion_estado);
+                $('#referencias').val(fraccionamiento.referencias);
+                $('#descripcion').val(fraccionamiento.descripcion);
 
                 // Habilitar edición
-                $('.fraccionamiento-details input').prop('readonly', false);
+                enableComponentsForEdition();
+
                 $('#saveFraccionamiento').show();
             },
             error: function(xhr, status, error) {
@@ -74,15 +104,21 @@ $(document).ready(function() {
     // Guardar cambios del fraccionamiento
     $('#saveFraccionamiento').on('click', function() {
         let fraccionamientoData = {
-            nombre: $('#nombreFraccionamiento').val(),
-            tipo: $('#tipoFraccionamiento').val(),
-            modelo_suscripcion: $('#modeloSuscripcion').val(),
-            direccion_calle: $('#direccionCalle').val(),
-            direccion_numero: $('#direccionNumero').val(),
-            direccion_colonia: $('#direccionColonia').val(),
-            direccion_cp: $('#direccionCP').val(),
-            direccion_ciudad: $('#direccionCiudad').val()
+            nombreComunidad: $('#nombreFraccionamiento').val(),
+            tipoComunidad: $('#tipoFraccionamiento').val(),
+            modeloSuscripcion: $('#modeloSuscripcion').val(),
+            direccionCalle: $('#direccionCalle').val(),
+            direccionNumero: $('#direccionNumero').val(),
+            direccionColonia: $('#direccionColonia').val(),
+            direccionCodigoPostal: $('#direccionCP').val(),
+            direccionCiudad: $('#direccionCiudad').val(),
+            direccionEstado: $('#direccionEstado').val(),
+            referencias: $('#referencias').val(),
+            descripcion: $('#descripcion').val(),
         };
+
+        console.log('debug:x Sending to update:');
+        console.log(fraccionamientoData);
 
         $.ajax({
             url: `/api/fraccionamientos/${selectedFraccionamientoId}`,

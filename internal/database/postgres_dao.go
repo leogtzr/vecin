@@ -109,7 +109,9 @@ func (dao *daoImpl) GetFraccionamientosByUser(userID int) ([]model.Fraccionamien
        			direccion_estado, 
        			direccion_pais,
        			tipo,
-       			modelo_suscripcion
+       			modelo_suscripcion,
+       			referencias,
+       			descripcion
        FROM comunidad WHERE usuario_registrante_id = $1`
 	rows, err := dao.db.Query(query, userID)
 	if err != nil {
@@ -127,7 +129,7 @@ func (dao *daoImpl) GetFraccionamientosByUser(userID int) ([]model.Fraccionamien
 		var fracc model.Fraccionamiento
 		if err := rows.Scan(&fracc.CommunityID, &fracc.Name, &fracc.DireccionCalle,
 			&fracc.DireccionNumero, &fracc.DireccionColonia, &fracc.DireccionCP, &fracc.DireccionEstado,
-			&fracc.DireccionCiudad, &fracc.DireccionPais, &fracc.Tipo, &fracc.ModeloSuscripcion); err != nil {
+			&fracc.DireccionCiudad, &fracc.DireccionPais, &fracc.Tipo, &fracc.ModeloSuscripcion, &fracc.Referencias, &fracc.Descripcion); err != nil {
 			return []model.Fraccionamiento{}, err
 		}
 		fraccionamientos = append(fraccionamientos, fracc)
@@ -147,7 +149,9 @@ func (dao *daoImpl) GetFraccionamientoDetailsByCommunityID(communityID string) (
        			direccion_estado, 
        			direccion_pais,
        			tipo,
-       			modelo_suscripcion
+       			modelo_suscripcion,
+       			referencias,
+       			descripcion
        FROM comunidad WHERE comunidad_id = $1`
 	rows, err := dao.db.Query(query, communityID)
 	if err != nil {
@@ -164,7 +168,7 @@ func (dao *daoImpl) GetFraccionamientoDetailsByCommunityID(communityID string) (
 	if rows.Next() {
 		if err := rows.Scan(&fracc.CommunityID, &fracc.Name, &fracc.DireccionCalle,
 			&fracc.DireccionNumero, &fracc.DireccionColonia, &fracc.DireccionCP, &fracc.DireccionEstado,
-			&fracc.DireccionCiudad, &fracc.DireccionPais, &fracc.Tipo, &fracc.ModeloSuscripcion); err != nil {
+			&fracc.DireccionCiudad, &fracc.DireccionPais, &fracc.Tipo, &fracc.ModeloSuscripcion, &fracc.Referencias, &fracc.Descripcion); err != nil {
 			return model.Fraccionamiento{}, err
 		}
 	}
@@ -203,9 +207,11 @@ func (dao *daoImpl) SaveCommunity(data model.RegisterFormData, userID int) (int,
 				   direccion_estado, 
 				   direccion_pais, 
 				   tipo, 
-				   modelo_suscripcion, 
-				   usuario_registrante_id
-	   ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING comunidad_id`,
+				   modelo_suscripcion,
+				   usuario_registrante_id,
+				   referencias, 
+				   descripcion
+	   ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING comunidad_id`,
 		data.NombreComunidad,
 		data.DireccionCalle,
 		data.DireccionNumero,
@@ -217,8 +223,12 @@ func (dao *daoImpl) SaveCommunity(data model.RegisterFormData, userID int) (int,
 		data.TipoComunidad,
 		data.ModeloSuscripcion,
 		userID,
+		data.Referencias,
+		data.Descripcion,
 	).Scan(&comunidadID)
 	if err != nil {
+		log.Printf("dao: error saving comunidad: %v", err)
+
 		return -1, err
 	}
 

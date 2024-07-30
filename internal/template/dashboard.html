@@ -10,7 +10,7 @@
         .action-panel {
             background-color: #f8f9fa;
             border-right: 1px solid #dee2e6;
-            height: calc(100vh - 56px - 58px); /* Ajustado para el footer */
+            height: calc(100vh - 56px - 58px);
         }
         .fraccionamiento-list {
             max-height: 300px;
@@ -18,11 +18,6 @@
         }
         .fraccionamiento-details {
             margin-top: 20px;
-        }
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
         }
     </style>
 </head>
@@ -84,7 +79,7 @@
                     <form>
                         <div class="form-group">
                             <label for="nombreFraccionamiento">Nombre</label>
-                            <input type="text" class="form-control" id="nombreFraccionamiento" value="Fraccionamiento Las Palmas" readonly>
+                            <input type="text" class="form-control" id="nombreFraccionamiento" value="" readonly>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-6">
@@ -93,31 +88,46 @@
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="modeloSuscripcion">Modelo de Suscripción</label>
-                                <input type="text" class="form-control" id="modeloSuscripcion" value="Mensual" readonly>
+                                <select class="form-control" id="modeloSuscripcion" name="modeloSuscripcion" required>
+                                </select>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-6">
                                 <label for="direccionCalle">Calle</label>
-                                <input type="text" class="form-control" id="direccionCalle" value="Av. Principal" readonly>
+                                <input type="text" class="form-control" id="direccionCalle" value="" readonly>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="direccionNumero">Número</label>
-                                <input type="text" class="form-control" id="direccionNumero" value="123" readonly>
+                                <input type="text" class="form-control" id="direccionNumero" value="" readonly>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-4">
                                 <label for="direccionColonia">Colonia</label>
-                                <input type="text" class="form-control" id="direccionColonia" value="Las Palmas" readonly>
+                                <input type="text" class="form-control" id="direccionColonia" value="" readonly>
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="direccionCP">Código Postal</label>
-                                <input type="text" class="form-control" id="direccionCP" value="44000" readonly>
+                                <input type="text" class="form-control" id="direccionCP" value="" readonly>
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="direccionCiudad">Ciudad</label>
-                                <input type="text" class="form-control" id="direccionCiudad" value="Guadalajara" readonly>
+                                <input type="text" class="form-control" id="direccionCiudad" value="" readonly>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="direccionEstado">Estado</label>
+                                <input type="text" class="form-control" id="direccionEstado" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="referencias">Referencias</label>
+                                <textarea class="form-control" id="referencias" readonly></textarea>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="descripcion">Descripción</label>
+                                <textarea class="form-control" id="descripcion" readonly></textarea>
                             </div>
                         </div>
                         <button type="button" class="btn btn-primary" id="saveFraccionamiento" style="display:none;">Guardar Cambios</button>
@@ -125,7 +135,6 @@
                 </div>
             </div>
 
-            <!-- Vista para habitante de fraccionamiento -->
             <div id="habitanteView" style="display: none;">
                 <!-- ... (contenido de la vista de habitante, sin cambios) ... -->
             </div>
@@ -133,7 +142,7 @@
     </div>
 </div>
 
-<footer class="footer home-footer py-3">
+<footer class="dashboard-footer home-footer py-3">
     <div class="container">
         <div class="row">
             <div class="col-6 text-left text-white">
