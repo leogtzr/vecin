@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"log"
@@ -146,6 +147,15 @@ func LandingPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// generateCSRFToken creates a safe CSRF token.
+func generateCSRFToken() (string, error) {
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(b), nil
+}
+
 func Login(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -186,16 +196,20 @@ func Login(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	// TODO: put the following in a function, for God sake...
 	store := middleware.GetSessionStore()
 	session, _ := store.Get(r, "session")
+
+	csrfToken, err := generateCSRFToken()
+	if err != nil {
+		http.Error(w, "Error generando token CSRF", http.StatusInternalServerError)
+		return
+	}
+
+	session.Values["csrf_token"] = csrfToken
 	session.Values["user_id"] = user.ID
 	_ = session.Save(r, w)
 
 	log.Printf("debug:x login for (%s), OK", user.Email)
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": "Login successful",
-	})
+	writeMessageWithStatusCode(w, "Login successful", http.StatusOK)
 }
 
 func redirectLoginPage(w http.ResponseWriter) {
@@ -248,7 +262,7 @@ func redirectToWelcomePage(w http.ResponseWriter) {
 
 // If the user is already logged in, we will redirect to the dashboard.
 // Ya sabemos que el usuario está registrado, así que mostramos el dashboard.
-func redirectToDashboard(w http.ResponseWriter) {
+func redirectToDashboard(w http.ResponseWriter, session *sessions.Session) {
 	templatePath := getTemplatePath("dashboard.html")
 
 	t, err := template.ParseFiles(templatePath)
@@ -260,10 +274,16 @@ func redirectToDashboard(w http.ResponseWriter) {
 
 	w.WriteHeader(http.StatusOK)
 
-	pageVariables := PageVariables{
-		Year:     time.Now().Format("2006"),
-		AppName:  "Vecin",
-		LoggedIn: false,
+	pageVariables := struct {
+		Year      string
+		AppName   string
+		LoggedIn  bool
+		CSRFToken string
+	}{
+		Year:      time.Now().Format("2006"),
+		AppName:   "Vecin",
+		LoggedIn:  false,
+		CSRFToken: session.Values["csrf_token"].(string),
 	}
 
 	err = t.Execute(w, pageVariables)
@@ -1592,8 +1612,15 @@ func LoginPage(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	// Check if the user is already logged in, if it is then redirect to the dashboard.
 	loggedIn := isLoggedIn(r)
 	if loggedIn {
+		session, err := middleware.GetSessionStore().Get(r, "session")
+		if err != nil {
+			redirectLoginPage(w)
+
+			return
+		}
+
 		log.Printf("debug:x user is logged in, redirecting to dashboard")
-		redirectToDashboard(w)
+		redirectToDashboard(w, session)
 
 		return
 	}

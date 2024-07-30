@@ -117,6 +117,14 @@ func createRoutes(svc *service.Service, dao *database.DAO, cfg *config.Config) *
 			},
 		},
 		Router{
+			Name:   "Logout",
+			Method: "POST",
+			Path:   "/logout",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.Logout(w, r)
+			},
+		},
+		Router{
 			Name:   "Login",
 			Method: "POST",
 			Path:   "/signIn",

@@ -34,7 +34,10 @@
                 <a class="nav-link" href="/perfil">Mi Perfil</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/logout">Cerrar Sesión</a>
+                <form action="/logout" method="post">
+                    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+                    <button type="submit" class="nav-link btn">Cerrar Sesión</button>
+                </form>
             </li>
         </ul>
     </div>
@@ -58,7 +61,10 @@
         <div class="col-md-9 py-3">
             <!-- Vista para administrador de fraccionamientos -->
             <div id="adminView">
-                <h2 class="mb-4">Mis Fraccionamientos</h2>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Mis Fraccionamientos</h2>
+                    <button type="button" class="btn btn-success" id="addFraccionamientoBtn">Agregar nuevo fraccionamiento</button>
+                </div>
                 <div class="fraccionamiento-list mb-4">
                     <table class="table table-hover" id="fraccionamientosTable">
                         <thead>
@@ -131,7 +137,7 @@
                             </div>
                         </div>
                         <button type="button" class="btn btn-primary" id="saveFraccionamiento" style="display:none;">Guardar Cambios</button>
-                        <button type="button" class="btn btn-primary" id="cancelSaveFraccionamiento" style="display:none;">Cancelar</button>
+                        <button type="button" class="btn btn-warning" id="cancelSaveFraccionamiento" style="display:none;">Cancelar</button>
                     </form>
                 </div>
             </div>

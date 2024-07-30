@@ -62,7 +62,7 @@ func DashboardPage(svc *service.Service, w http.ResponseWriter, r *http.Request)
 
 	log.Println("debug:x DashboardPage")
 
-	redirectToDashboard(w)
+	redirectToDashboard(w, session)
 }
 
 func UpdateFracc(svc *service.Service, w http.ResponseWriter, r *http.Request) {
@@ -100,4 +100,38 @@ func UpdateFracc(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeMessageWithStatusCode(w, "Successfully updated fracc", http.StatusOK)
+}
+
+func Logout(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	store := middleware.GetSessionStore()
+	session, err := store.Get(r, "session")
+	if err != nil {
+		http.Error(w, "Error obteniendo la sesión", http.StatusInternalServerError)
+		return
+	}
+
+	// Verificar el token CSRF
+	csrfToken := r.FormValue("csrf_token")
+	if csrfToken != session.Values["csrf_token"] {
+		http.Error(w, "Token CSRF inválido", http.StatusForbidden)
+		return
+	}
+
+	// Clear all the values from session:
+	session.Values = make(map[interface{}]interface{})
+	session.Options.MaxAge = -1
+
+	err = session.Save(r, w)
+	if err != nil {
+		http.Error(w, "Error guardando la sesión", http.StatusInternalServerError)
+		return
+	}
+
+	//
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
