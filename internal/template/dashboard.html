@@ -22,149 +22,147 @@
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/">Vecin</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="/perfil">Mi Perfil</a>
-            </li>
-            <li class="nav-item">
-                <form action="/logout" method="post">
-                    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
-                    <button type="submit" class="nav-link btn">Cerrar Sesión</button>
-                </form>
-            </li>
-        </ul>
-    </div>
-</nav>
-
-<div class="container-fluid">
-    <div class="row">
-        <!-- Panel de acciones (izquierda) -->
-        <div class="col-md-3 action-panel py-3">
-            <h4 class="mb-4">Acciones</h4>
-            <div class="list-group">
-                <a href="#" class="list-group-item list-group-item-action" id="registrarFraccionamiento">Registrar Nuevo Fraccionamiento</a>
-                <a href="#" class="list-group-item list-group-item-action" id="gestionarHabitantes">Gestionar Habitantes</a>
-                <a href="#" class="list-group-item list-group-item-action" id="crearAnuncio">Crear Anuncio</a>
-                <a href="#" class="list-group-item list-group-item-action" id="programarJunta">Programar Junta</a>
-                <a href="#" class="list-group-item list-group-item-action" id="gestionarCuotas">Gestionar Cuotas</a>
-            </div>
-        </div>
-
-        <!-- Contenido principal (derecha) -->
-        <div class="col-md-9 py-3">
-            <!-- Vista para administrador de fraccionamientos -->
-            <div id="adminView">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2>Mis Fraccionamientos</h2>
-<!--                    <button type="button" class="btn btn-success" id="addFraccionamientoBtn">Agregar nuevo fraccionamiento</button>-->
-                    <a class="btn btn-info" href="/registrar-fraccionamiento">Agregar nuevo fraccionamiento ➕</a>
-                </div>
-                <div class="fraccionamiento-list mb-4">
-                    <table class="table table-hover" id="fraccionamientosTable">
-                        <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Tipo</th>
-                            <th>Estado</th>
-                            <th>Ciudad</th>
-                            <th>Acciones</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="fraccionamiento-details">
-                    <h3>Detalles del Fraccionamiento</h3>
-                    <form>
-                        <div class="form-group">
-                            <label for="nombreFraccionamiento">Nombre</label>
-                            <input type="text" class="form-control" id="nombreFraccionamiento" value="" readonly>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="tipoFraccionamiento">Tipo</label>
-                                <input type="text" class="form-control" id="tipoFraccionamiento" value="Fraccionamiento" readonly>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="modeloSuscripcion">Modelo de Suscripción</label>
-                                <select class="form-control" id="modeloSuscripcion" name="modeloSuscripcion" required readonly>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="direccionCalle">Calle</label>
-                                <input type="text" class="form-control" id="direccionCalle" value="" readonly>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="direccionNumero">Número</label>
-                                <input type="text" class="form-control" id="direccionNumero" value="" readonly>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-4">
-                                <label for="direccionColonia">Colonia</label>
-                                <input type="text" class="form-control" id="direccionColonia" value="" readonly>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="direccionCP">Código Postal</label>
-                                <input type="text" class="form-control" id="direccionCP" value="" readonly>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="direccionCiudad">Ciudad</label>
-                                <input type="text" class="form-control" id="direccionCiudad" value="" readonly>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="direccionEstado">Estado</label>
-                                <input type="text" class="form-control" id="direccionEstado" value="" readonly>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-4">
-                                <label for="referencias">Referencias</label>
-                                <textarea class="form-control" id="referencias" readonly></textarea>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="descripcion">Descripción</label>
-                                <textarea class="form-control" id="descripcion" readonly></textarea>
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-primary" id="saveFraccionamiento" style="display:none;">Guardar Cambios 💾</button>
-                        <button type="button" class="btn btn-warning" id="cancelSaveFraccionamiento" style="display:none;">Cancelar ❎</button>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Vecin</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/perfil">Mi Perfil</a>
+                </li>
+                <li class="nav-item">
+                    <form action="/logout" method="post">
+                        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+                        <button type="submit" class="nav-link btn">Cerrar Sesión</button>
                     </form>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Panel de acciones (izquierda) -->
+            <div class="col-md-3 action-panel py-3">
+                <h4 class="mb-4">Acciones</h4>
+                <div class="list-group">
+                    <a href="/registrar-fraccionamiento" class="list-group-item list-group-item-action" id="registrarFraccionamiento">Registrar Nuevo Fraccionamiento</a>
+                    <a href="#" class="list-group-item list-group-item-action" id="gestionarHabitantes">Gestionar Habitantes 👩‍👧‍👧</a>
+                    <a href="#" class="list-group-item list-group-item-action" id="crearAnuncio">Crear Anuncio 🗣📢</a>
+                    <a href="#" class="list-group-item list-group-item-action" id="programarJunta">Programar Junta</a>
+                    <a href="#" class="list-group-item list-group-item-action" id="gestionarCuotas">Gestionar Cuotas 💶</a>
                 </div>
             </div>
 
-            <div id="habitanteView" style="display: none;">
-                <!-- ... (contenido de la vista de habitante, sin cambios) ... -->
+            <!-- Contenido principal (derecha) -->
+            <div class="col-md-9 py-3">
+                <!-- Vista para administrador de fraccionamientos -->
+                <div id="adminView">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Mis Fraccionamientos</h2>
+    <!--                    <button type="button" class="btn btn-success" id="addFraccionamientoBtn">Agregar nuevo fraccionamiento</button>-->
+                        <a class="btn btn-info" href="/registrar-fraccionamiento">Agregar nuevo fraccionamiento ➕</a>
+                    </div>
+                    <div class="fraccionamiento-list mb-4">
+                        <table class="table table-hover" id="fraccionamientosTable">
+                            <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Tipo</th>
+                                <th>Estado</th>
+                                <th>Ciudad</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="fraccionamiento-details">
+                        <h3>Detalles del Fraccionamiento</h3>
+                        <form>
+                            <div class="form-group">
+                                <label for="nombreFraccionamiento">Nombre</label>
+                                <input type="text" class="form-control" id="nombreFraccionamiento" value="" readonly>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="tipoFraccionamiento">Tipo</label>
+                                    <input type="text" class="form-control" id="tipoFraccionamiento" value="Fraccionamiento" readonly>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="modeloSuscripcion">Modelo de Suscripción</label>
+                                    <select class="form-control" id="modeloSuscripcion" name="modeloSuscripcion" required readonly>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="direccionCalle">Calle</label>
+                                    <input type="text" class="form-control" id="direccionCalle" value="" readonly>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="direccionNumero">Número</label>
+                                    <input type="text" class="form-control" id="direccionNumero" value="" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label for="direccionColonia">Colonia</label>
+                                    <input type="text" class="form-control" id="direccionColonia" value="" readonly>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="direccionCP">Código Postal</label>
+                                    <input type="text" class="form-control" id="direccionCP" value="" readonly>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="direccionCiudad">Ciudad</label>
+                                    <input type="text" class="form-control" id="direccionCiudad" value="" readonly>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="direccionEstado">Estado</label>
+                                    <input type="text" class="form-control" id="direccionEstado" value="" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label for="referencias">Referencias</label>
+                                    <textarea class="form-control" id="referencias" readonly></textarea>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="descripcion">Descripción</label>
+                                    <textarea class="form-control" id="descripcion" readonly></textarea>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary" id="saveFraccionamiento" style="display:none;">Guardar Cambios 💾</button>
+                            <button type="button" class="btn btn-warning" id="cancelSaveFraccionamiento" style="display:none;">Cancelar ❎</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="habitanteView" style="display: none;">
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<footer class="dashboard-footer home-footer py-3">
-    <div class="container">
-        <div class="row">
-            <div class="col-6 text-left text-white">
-                ABC: <span id="someId">DEF</span>
-            </div>
-            <div class="col-6 text-right text-white">
-                © 2024 Vecin
+    <footer class="dashboard-footer home-footer py-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-6 text-left text-white">
+                    ABC: <span id="someId">DEF</span>
+                </div>
+                <div class="col-6 text-right text-white">
+                    © 2024 Vecin
+                </div>
             </div>
         </div>
-    </div>
-</footer>
+    </footer>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="/assets/js/dashboard.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/assets/js/dashboard.js"></script>
 </body>
 </html>
