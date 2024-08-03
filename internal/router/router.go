@@ -188,6 +188,14 @@ func createRoutes(svc *service.Service, dao *database.DAO, cfg *config.Config) *
 				handler.GenError(dao, w, r)
 			},
 		},
+		Router{
+			Name:   "Resend Activation Link",
+			Method: "POST",
+			Path:   "/resend-activation",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.ResendActivationEmail(dao, svc, w, r)
+			},
+		},
 	}
 
 	return routes

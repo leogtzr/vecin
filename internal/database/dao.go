@@ -26,6 +26,9 @@ type DAO interface {
 	HasRegisteredAFracc(userID int) (bool, error)
 	IsPartOfComunidad(userID int) (bool, error)
 
+	// Información sobre la confirmación del usuario:
+	GetAccountConfirmationInformationByUserID(userID int) (model.ConfirmationAccount, error)
+
 	DB() *sql.DB
 }
 

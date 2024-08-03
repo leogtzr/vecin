@@ -155,3 +155,4 @@ CREATE INDEX idx_anuncio_casa_departamento_id ON anuncio_casa(departamento_id);
 CREATE INDEX idx_bazar_casa_id ON bazar(casa_id);
 CREATE INDEX idx_bazar_departamento_id ON bazar(departamento_id);
 CREATE INDEX idx_confirmacion_token ON confirmacion_cuenta(token);
+CREATE INDEX idx_confirmacion_usuario_id ON confirmacion_cuenta(usuario_id);

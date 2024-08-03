@@ -66,6 +66,14 @@
             display: none;
             margin-top: 1rem;
         }
+        .resend-link {
+            color: #1a73e8;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .resend-link:hover {
+            color: #0c5abb;
+        }
     </style>
 </head>
 <body>
@@ -81,7 +89,10 @@
             <label for="password">Contraseña</label>
             <input type="password" class="form-control" id="password" placeholder="Ingresa tu contraseña">
         </div>
-        <div class="alert alert-danger" id="alert">Las contraseñas no coinciden. Por favor, inténtelo de nuevo.</div>
+        <div class="alert alert-danger" id="alert">
+            <span id="alert-message">Las contraseñas no coinciden. Por favor, inténtelo de nuevo.</span>
+            <span class="resend-link" id="resend-link" style="display: none;">Reenviar correo de activación.</span>
+        </div>
         <button type="submit" class="btn btn-primary">Ingresar</button>
         <div class="footer-links mt-3">
             <a href="#">¿Olvidaste tu correo?</a>

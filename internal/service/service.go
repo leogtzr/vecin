@@ -107,6 +107,41 @@ func (s *Service) ConfirmAccount(token string) (model.Usuario, error) {
 	return userConfirmedAccount, nil
 }
 
+func (s *Service) CreateNewConfirmationAccountToken(userID int) (string, error) {
+	tx, err := s.dao.DB().Begin()
+	if err != nil {
+		return "", err
+	}
+
+	_, err = tx.Exec("DELETE FROM confirmacion_cuenta WHERE token = $1", userID)
+	if err != nil {
+		_ = tx.Rollback()
+		return "", err
+	}
+
+	newToken, err := s.GenerateToken()
+	if err != nil {
+		_ = tx.Rollback()
+		return "", err
+	}
+
+	expirationDate := time.Now().Add(s.Config.UserTokenExpiryDays)
+
+	_, err = tx.Exec("INSERT INTO confirmacion_cuenta (usuario_id, token, fecha_expiracion) VALUES ($1, $2, $3)",
+		userID, newToken, expirationDate)
+	if err != nil {
+		_ = tx.Rollback()
+		return "", err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return "", err
+	}
+
+	return newToken, nil
+}
+
 func (s *Service) SendConfirmationEmail(username, email, token string) error {
 	//bypass email sending:
 	//return s.EmailSender.Send(username, email, token)
@@ -153,10 +188,12 @@ func (s *Service) SaveUser(signUpFormData model.SignUpFormData, token string) er
 	return nil
 }
 
+// TODO: might get the fraccs
 func (s *Service) GetFraccionamientos(userID int) ([]model.Fraccionamiento, error) {
 	return s.dao.GetCommunitiesByUser(userID)
 }
 
+// TODO: might need to change the name
 func (s *Service) GetFraccionamientoDetail(communityID string) (model.Fraccionamiento, error) {
 	return s.dao.GetCommunityDetailsByID(communityID)
 }

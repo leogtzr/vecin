@@ -641,3 +641,33 @@ func (dao *daoImpl) Ping() error {
 // func (database *postgresBookDAO) GetWishListBooks() ([]book.WishListBook, error) {
 // 	return database.wishListBooks, nil
 // }
+
+func (dao *daoImpl) GetAccountConfirmationInformationByUserID(userID int) (model.ConfirmationAccount, error) {
+	query := `SELECT confirmacion_id, usuario_id, token, fecha_expiracion FROM comunidad WHERE usuario_id = $1`
+
+	rows, err := dao.db.Query(query, userID)
+	if err != nil {
+		return model.ConfirmationAccount{}, err
+	}
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}(rows)
+
+	var confirmationAccount model.ConfirmationAccount
+	if rows.Next() {
+		if err := rows.Scan(&confirmationAccount.ConfirmationID,
+			&confirmationAccount.UserID,
+			&confirmationAccount.Token,
+			&confirmationAccount.ExpirationTime); err != nil {
+			return model.ConfirmationAccount{}, err
+		}
+	} else {
+		// no results...
+		return model.ConfirmationAccount{}, sql.ErrNoRows
+	}
+
+	return confirmationAccount, nil
+}

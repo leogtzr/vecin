@@ -188,6 +188,13 @@ func Login(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Verificar si el usuario ha sido activado:
+	if !user.Activo {
+		writeMessageWithStatusCode(w, "Tu cuenta no ha sido activada. Por favor, revisa tu correo electrónico para el enlace de activación.", http.StatusForbidden)
+
+		return
+	}
+
 	if err := bcrypt.CompareHashAndPassword([]byte(user.HashContrasena), []byte(password)); err != nil {
 		writeMessageWithStatusCode(w, "Usuario o contraseña incorrectos", http.StatusUnauthorized)
 

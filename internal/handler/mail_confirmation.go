@@ -1,11 +1,15 @@
 package handler
 
 import (
+	"database/sql"
+	"encoding/json"
+	"errors"
 	"github.com/gorilla/mux"
 	"html/template"
 	"log"
 	"net/http"
 	"time"
+	"vecin/internal/database"
 	"vecin/internal/model"
 	"vecin/internal/service"
 )
@@ -99,4 +103,50 @@ func ConfirmAccountLinkSent(w http.ResponseWriter, r *http.Request) {
 		log.Printf("error: %v", err)
 		return
 	}
+}
+
+func ResendActivationEmail(dao *database.DAO, svc *service.Service, w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		writeMessageWithStatusCode(w, "Método no permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var payload struct {
+		Email string `json:"email"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		writeMessageWithStatusCode(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	user, err := (*dao).GetUserByEmail(payload.Email)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			writeMessageWithStatusCode(w, "Correo no registrado", http.StatusNotFound)
+			return
+		}
+		writeMessageWithStatusCode(w, "Error interno del servidor", http.StatusInternalServerError)
+		return
+	}
+
+	if user.Activo {
+		writeMessageWithStatusCode(w, "La cuenta ya está activada", http.StatusBadRequest)
+		return
+	}
+
+	token, err := svc.CreateNewConfirmationAccountToken(user.ID)
+	if err != nil {
+		writeMessageWithStatusCode(w, "Error al enviar el correo de activación (token)", http.StatusInternalServerError)
+		return
+	}
+
+	// Reenviar el correo de activación aquí:
+	err = svc.SendConfirmationEmail(user.Username, user.Email, token)
+	if err != nil {
+		writeMessageWithStatusCode(w, "Error al enviar el correo de activación", http.StatusInternalServerError)
+		return
+	}
+
+	writeMessageWithStatusCode(w, "Correo de activación reenviado exitosamente", http.StatusOK)
 }
