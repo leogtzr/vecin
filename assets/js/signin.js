@@ -25,6 +25,10 @@ $(document).ready(function() {
                 try {
                     const responseJSON = JSON.parse(xhr.responseText);
                     errorMessage = responseJSON.message || errorMessage;
+                    $('#alert').text(errorMessage).fadeIn();
+                    setTimeout(function() {
+                        $('#alert').fadeOut();
+                    }, 3000);
                 } catch (e) {
                     console.error('Error parsing JSON:', e);
                 }

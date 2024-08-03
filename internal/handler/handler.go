@@ -189,7 +189,8 @@ func Login(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.HashContrasena), []byte(password)); err != nil {
-		http.Error(w, "Usuario o contraseña incorrectos", http.StatusUnauthorized)
+		writeMessageWithStatusCode(w, "Usuario o contraseña incorrectos", http.StatusUnauthorized)
+
 		return
 	}
 
@@ -286,8 +287,7 @@ func redirectToDashboard(w http.ResponseWriter, session *sessions.Session) {
 		CSRFToken: session.Values["csrf_token"].(string),
 	}
 
-	err = t.Execute(w, pageVariables)
-	if err != nil {
+	if err = t.Execute(w, pageVariables); err != nil {
 		log.Printf("error: %v", err)
 		return
 	}
