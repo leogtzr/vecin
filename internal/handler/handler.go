@@ -297,8 +297,7 @@ func redirectToDashboard(w http.ResponseWriter, session *sessions.Session) {
 // path: "/registrar-fraccionamiento"
 func RegisterFracc(w http.ResponseWriter, r *http.Request) {
 	// Verificar si el usuario no ha hecho login, si no mandar a hacer una cuenta.
-	loggedIn := isLoggedIn(r)
-	if !loggedIn {
+	if loggedIn := isLoggedIn(r); !loggedIn {
 		redirectLoginPage(w)
 
 		return
@@ -1426,7 +1425,7 @@ func FormRegisterFracc(dao *database.DAO, w http.ResponseWriter, r *http.Request
 	}
 
 	// Save the data:
-	comunidadID, err := (*dao).SaveCommunity(formData, userID)
+	comunidadID, err := (*dao).CreateCommunity(formData, userID)
 
 	w.WriteHeader(http.StatusOK)
 	resp := map[string]string{
@@ -1468,29 +1467,6 @@ func ViewFraccsPage(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterPage(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
-	//now := time.Now()
-	//
-	//pageVariables := PageVariables{
-	//	Year:    now.Format("2006"),
-	//	AppName: "Vecin",
-	//}
-	//
-	//tmpl, err := template.ParseFiles(
-	//	addTemplateFiles("internal/template/register.html")...,
-	//)
-	//if err != nil {
-	//	log.Printf("Error parsing templates: %v", err)
-	//	http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	//	return
-	//}
-	//
-	//err = tmpl.ExecuteTemplate(w, "base", pageVariables)
-	//if err != nil {
-	//	log.Printf("Error executing template: %v", err)
-	//	http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	//	return
-	//}
-
 	templatePath := getTemplatePath("register.html")
 
 	t, err := template.ParseFiles(templatePath)
@@ -1610,8 +1586,7 @@ func isLoggedIn(r *http.Request) bool {
 
 func LoginPage(dao *database.DAO, w http.ResponseWriter, r *http.Request) {
 	// Check if the user is already logged in, if it is then redirect to the dashboard.
-	loggedIn := isLoggedIn(r)
-	if loggedIn {
+	if loggedIn := isLoggedIn(r); loggedIn {
 		session, err := middleware.GetSessionStore().Get(r, "session")
 		if err != nil {
 			redirectLoginPage(w)
@@ -1655,4 +1630,58 @@ func CheckEmail(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(CheckEmailResponse{
 		Exists: exists,
 	})
+}
+
+func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("debug:x somebody tried to access a non existing page...")
+	w.WriteHeader(http.StatusNotFound)
+
+	templatePath := getTemplatePath("404.html")
+
+	tmpl, err := template.ParseFiles(templatePath)
+	if err != nil {
+		log.Printf("Error parsing 404 template: %v", err)
+		http.Error(w, "Page Not Found", http.StatusNotFound)
+		return
+	}
+
+	err = tmpl.Execute(w, nil)
+	if err != nil {
+		log.Printf("Error executing 404 template: %v", err)
+		http.Error(w, "Page Not Found", http.StatusNotFound)
+		return
+	}
+}
+
+func ProfilePage(svc *service.Service, w http.ResponseWriter, r *http.Request) {
+	log.Printf("debug:x Profile Page")
+
+	if loggedIn := isLoggedIn(r); !loggedIn {
+		redirectLoginPage(w)
+
+		return
+	}
+
+	templatePath := getTemplatePath("profile.html")
+
+	t, err := template.ParseFiles(templatePath)
+	if err != nil {
+		log.Printf("error: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusUnauthorized)
+
+	pageVariables := PageVariables{
+		Year:     time.Now().Format("2006"),
+		AppName:  "Vecin",
+		LoggedIn: false,
+	}
+
+	err = t.Execute(w, pageVariables)
+	if err != nil {
+		log.Printf("error: %v", err)
+		return
+	}
 }

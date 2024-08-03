@@ -117,6 +117,14 @@ func createRoutes(svc *service.Service, dao *database.DAO, cfg *config.Config) *
 			},
 		},
 		Router{
+			Name:   "Perfil Page",
+			Method: "GET",
+			Path:   "/perfil",
+			HandlerFunc: func(w http.ResponseWriter, r *http.Request) {
+				handler.ProfilePage(svc, w, r)
+			},
+		},
+		Router{
 			Name:   "Logout",
 			Method: "POST",
 			Path:   "/logout",
@@ -211,6 +219,8 @@ func NewRouter(dao *database.DAO, limiter *rate.Limiter, cfg *config.Config) *mu
 
 	fs := http.FileServer(http.Dir("assets/"))
 	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", fs))
+
+	router.NotFoundHandler = http.HandlerFunc(handler.NotFoundHandler)
 
 	return router
 }

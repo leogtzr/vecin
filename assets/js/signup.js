@@ -4,6 +4,13 @@ $(document).ready(function() {
         return phoneRegex.test(phone);
     }
 
+    function isValidUsername(username) {
+        const trimmedUsername = username.trim();
+        const usernameRegex = /^[a-zA-Z0-9]{5,14}$/;
+
+        return usernameRegex.test(trimmedUsername);
+    }
+
     function isValidPassword(password) {
         const minLength = 8;
         const hasUpperCase = /[A-Z]/.test(password);
@@ -13,6 +20,16 @@ $(document).ready(function() {
 
         return password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
     }
+
+    $('#username').on('blur', function () {
+        if (!isValidUsername($(this).val())) {
+            $(this).addClass('is-invalid');
+            $('#userNameHelp').text('El nombre de usuario debe contener solo letras y números, y tener entre 5 y 14 caracteres.').show();
+        } else {
+            $(this).removeClass('is-invalid').addClass('is-valid');
+            $('#userNameHelp').hide();
+        }
+    });
 
     $('#password').on('input', function() {
         if (!isValidPassword($(this).val())) {
@@ -37,6 +54,7 @@ $(document).ready(function() {
     $('#signUp').on('submit', function(e) {
         e.preventDefault();
 
+        var username = $('#username').val();
         var password = $('#password').val();
         var confirmPassword = $('#confirm_password').val();
         var phone = $('#telefono').val();
@@ -46,6 +64,13 @@ $(document).ready(function() {
             setTimeout(function() {
                 $('#alert').fadeOut();
             }, 6000);
+            return;
+        }
+
+        if (!isValidUsername(username)) {
+            $(this).addClass('is-invalid');
+            $('#userNameHelp').text('El nombre de usuario debe contener solo letras y números, y tener entre 5 y 14 caracteres.').show();
+
             return;
         }
 
@@ -81,7 +106,7 @@ $(document).ready(function() {
                     }, 6000);
                 } else {
                     var formData = {
-                        username: $('#username').val(),
+                        username: username,
                         nombre: $('#nombre').val(),
                         apellido: $('#apellido').val(),
                         telefono: phone,

@@ -1,3 +1,5 @@
+import { showModal } from './modalHelper.js';
+
 $(document).ready(function() {
     let selectedFraccionamientoId = null;
 
@@ -22,7 +24,7 @@ $(document).ready(function() {
                             <td>${fraccionamiento.direccion_ciudad}</td>
                             <td>
                                 <button class="btn btn-sm btn-info edit-btn">Editar ✏️</button>
-                                <button class="btn btn-sm btn-danger delete-btn">Eliminar 🗑</button>
+                                <button class="btn btn-sm btn-danger delete-btn" disabled>Eliminar 🗑</button>
                             </td>
                         </tr>
                     `);
@@ -145,15 +147,22 @@ $(document).ready(function() {
             data: JSON.stringify(fraccionamientoData),
             success: function(response) {
                 console.log(response);
-                alert('Fraccionamiento actualizado con éxito');
+                //alert('Fraccionamiento actualizado con éxito');
                 loadFraccionamientos();
                 disableComponentsForEdition();
                 $('#saveFraccionamiento').hide();
                 $('#cancelSaveFraccionamiento').hide();
+
+                showModal('Fraccionamiento actualizado con éxito', 'success');
             },
             error: function(xhr, status, error) {
                 // TODO: improve this:
-                alert('Error al actualizar fraccionamiento: ' + error);
+                //alert('Error al actualizar fraccionamiento: ' + error);
+                console.log(status);
+                console.log(error);
+                console.log(xhr);
+                // showErrorModal('Error al actualizar fraccionamiento: ' + error);
+                showModal('Error al cargar fraccionamientos: ' + error, 'error');
             }
         });
     });

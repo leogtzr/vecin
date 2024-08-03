@@ -65,6 +65,8 @@ func DashboardPage(svc *service.Service, w http.ResponseWriter, r *http.Request)
 	redirectToDashboard(w, session)
 }
 
+// UpdateFracc updates a community by its ID.
+// path: "/api/fraccionamientos/{communityID}"
 func UpdateFracc(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	if r.Method != "PUT" {
 		writeMessageWithStatusCode(w, "method not allowed", http.StatusMethodNotAllowed)
@@ -95,9 +97,13 @@ func UpdateFracc(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	fmt.Println(formData)
 	err = svc.UpdateFracc(communityID, formData)
 	if err != nil {
+		log.Printf("Error updating fraccion: %v", err)
+
 		writeMessageWithStatusCode(w, "Error updating fracc", http.StatusInternalServerError)
 		return
 	}
+
+	log.Printf("debug:x done updating fracc (communityID=(%d))", communityID)
 
 	writeMessageWithStatusCode(w, "Successfully updated fracc", http.StatusOK)
 }

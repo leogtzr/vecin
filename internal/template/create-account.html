@@ -64,21 +64,9 @@
             display: none;
             margin-top: 1rem;
         }
-        /*.payment-options h4 {*/
-        /*    text-align: center;*/
-        /*}*/
-        /*.payment-options {*/
-        /*    margin-top: 1rem;*/
-        /*    text-align: left;*/
-        /*}*/
-        /*.payment-option {*/
-        /*    display: flex;*/
-        /*    align-items: center;*/
-        /*    margin-bottom: 1rem;*/
-        /*}*/
-        /*.payment-option input {*/
-        /*    margin-right: 1rem;*/
-        /*}*/
+        .is-invalid {
+            border-color: #ff0000;
+        }
         .register-container img {
             display: block;
             margin: 0 auto 1.5rem;
@@ -93,6 +81,7 @@
         <div class="form-group">
             <label for="username">Nombre de usuario</label>
             <input type="text" class="form-control" id="username" name="username" placeholder="Ejemplo: leogtz" required>
+            <small id="userNameHelp" class="form-text text-muted" style="display:none;"></small>
         </div>
         <div class="form-group">
             <label for="nombre">Nombre</label>

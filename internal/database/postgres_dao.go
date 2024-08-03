@@ -98,7 +98,7 @@ func (dao *daoImpl) GetUserByEmail(email string) (*model.Usuario, error) {
 	return &user, nil
 }
 
-func (dao *daoImpl) GetFraccionamientosByUser(userID int) ([]model.Fraccionamiento, error) {
+func (dao *daoImpl) GetCommunitiesByUser(userID int) ([]model.Fraccionamiento, error) {
 	query := `SELECT comunidad_id, 
        			nombre,
        			direccion_calle, 
@@ -138,7 +138,7 @@ func (dao *daoImpl) GetFraccionamientosByUser(userID int) ([]model.Fraccionamien
 	return fraccionamientos, nil
 }
 
-func (dao *daoImpl) GetFraccionamientoDetailsByCommunityID(communityID string) (model.Fraccionamiento, error) {
+func (dao *daoImpl) GetCommunityDetailsByID(communityID string) (model.Fraccionamiento, error) {
 	query := `SELECT comunidad_id, 
        			nombre,
        			direccion_calle, 
@@ -192,7 +192,7 @@ func (dao *daoImpl) UserExistsByEmail(email string) (bool, error) {
 }
 
 // SaveCommunity saves a community into the database.
-func (dao *daoImpl) SaveCommunity(data model.FraccionamientoFormData, userID int) (int, error) {
+func (dao *daoImpl) CreateCommunity(data model.FraccionamientoFormData, userID int) (int, error) {
 	var comunidadID int
 	var err error
 
@@ -245,7 +245,7 @@ func (dao *daoImpl) UpdateCommunity(data model.FraccionamientoFormData, communit
 	}
 
 	_, err = tx.Exec(`
-			UPDATE comunidad 
+			UPDATE comunidad
 			SET nombre = $1, 
 			    tipo = $2, 
 			    modelo_suscripcion = $3, 

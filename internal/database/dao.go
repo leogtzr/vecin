@@ -7,17 +7,25 @@ import (
 )
 
 type DAO interface {
+	// Admin
 	Close() error
 	Ping() error
+
+	// Usuarios
 	GetUserByUsername(username string) (*model.Usuario, error)
 	GetUserByEmail(email string) (*model.Usuario, error)
-	SaveCommunity(data model.FraccionamientoFormData, userID int) (int, error)
-	UpdateCommunity(data model.FraccionamientoFormData, communityID int) (int, error)
 	UserExistsByEmail(email string) (bool, error)
+
+	//Comunidades
+	CreateCommunity(data model.FraccionamientoFormData, userID int) (int, error)
+	UpdateCommunity(data model.FraccionamientoFormData, communityID int) (int, error)
+	GetCommunitiesByUser(userID int) ([]model.Fraccionamiento, error)
+	GetCommunityDetailsByID(id string) (model.Fraccionamiento, error)
+
+	// Relaciones usuario-comunidad
 	HasRegisteredAFracc(userID int) (bool, error)
 	IsPartOfComunidad(userID int) (bool, error)
-	GetFraccionamientosByUser(userID int) ([]model.Fraccionamiento, error)
-	GetFraccionamientoDetailsByCommunityID(id string) (model.Fraccionamiento, error)
+
 	DB() *sql.DB
 }
 
