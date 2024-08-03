@@ -141,7 +141,6 @@ func ResendActivationEmail(dao *database.DAO, svc *service.Service, w http.Respo
 		return
 	}
 
-	// Reenviar el correo de activación aquí:
 	err = svc.SendConfirmationEmail(user.Username, user.Email, token)
 	if err != nil {
 		writeMessageWithStatusCode(w, "Error al enviar el correo de activación", http.StatusInternalServerError)

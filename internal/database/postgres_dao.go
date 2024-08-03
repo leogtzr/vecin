@@ -48,14 +48,6 @@ import (
 // 	return nil
 // }
 
-// func (database *postgresBookDAO) AddImageToBook(bookID int, imageData []byte) error {
-// 	return addImageToBook(bookID, imageData, database.db)
-// }
-
-// func (database *postgresBookDAO) AddUser(userID, email, name, oauthIdentifier string) error {
-// 	return addUser(database.db, userID, email, name, oauthIdentifier)
-// }
-
 func (dao *daoImpl) Close() error {
 	return dao.db.Close()
 }
@@ -429,10 +421,6 @@ func (dao *daoImpl) SaveCommunity(data model.FraccionamientoFormData) (int, erro
 // 	return nil
 // }
 
-// func (database *postgresBookDAO) GetAllAuthors() ([]string, error) {
-// 	return getAllAuthors(database.db)
-// }
-
 // func (database *postgresBookDAO) GetBookByID(id int) (book.BookInfo, error) {
 // 	var err error
 // 	var queryStr = `SELECT b.id, b.title, b.author, b.description, b.read, b.added_on, b.goodreads_link FROM books b WHERE b.id=$1`
@@ -480,10 +468,6 @@ func (dao *daoImpl) SaveCommunity(data model.FraccionamientoFormData) (int, erro
 // 	bookInfo.Base64Images = bookImages
 
 // 	return bookInfo, nil
-// }
-
-// func (database *postgresBookDAO) GetBookCount() (int, error) {
-// 	return getBookCount(database.db)
 // }
 
 // func (database *postgresBookDAO) GetBooksWithPagination(offset, limit int) ([]book.BookInfo, error) {
@@ -535,10 +519,6 @@ func (dao *daoImpl) SaveCommunity(data model.FraccionamientoFormData) (int, erro
 // 	}
 
 // 	return books, nil
-// }
-
-// func (database *postgresBookDAO) GetImagesByBookID(bookID int) ([]book.BookImageInfo, error) {
-// 	return getImagesByBookID(bookID, database.db)
 // }
 
 // func (database *postgresBookDAO) GetUserInfoByID(id string) (user.UserInfo, error) {
@@ -605,26 +585,9 @@ func (dao *daoImpl) SaveCommunity(data model.FraccionamientoFormData) (int, erro
 // 	return nil
 // }
 
-// func (database *postgresBookDAO) LikesCount(bookID int) (int, error) {
-// 	var count int
-// 	if err := database.db.QueryRow("SELECT COUNT(*) FROM book_likes WHERE book_id = $1", bookID).Scan(&count); err != nil {
-// 		return -1, err
-// 	}
-
-// 	return count, nil
-// }
-
 func (dao *daoImpl) Ping() error {
 	return dao.db.Ping()
 }
-
-// func (database *postgresBookDAO) RemoveImage(imageID int) error {
-// 	if _, err := database.db.Exec("DELETE FROM book_images WHERE image_id=$1", imageID); err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
 
 // func (database *postgresBookDAO) UnlikeBook(bookID, userID string) error {
 // 	if _, err := database.db.Exec("DELETE FROM book_likes WHERE book_id=$1 AND user_id=$2", bookID, userID); err != nil {
@@ -632,14 +595,6 @@ func (dao *daoImpl) Ping() error {
 // 	}
 
 // 	return nil
-// }
-
-// func (database *postgresBookDAO) UpdateBook(title string, author string, description string, read bool, goodreadsLink string, id int) error {
-// 	return updateBook(title, author, description, read, goodreadsLink, id, database.db)
-// }
-
-// func (database *postgresBookDAO) GetWishListBooks() ([]book.WishListBook, error) {
-// 	return database.wishListBooks, nil
 // }
 
 func (dao *daoImpl) GetAccountConfirmationInformationByUserID(userID int) (model.ConfirmationAccount, error) {
