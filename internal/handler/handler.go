@@ -333,26 +333,6 @@ func RegisterFracc(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func getDatabaseEmailFromSessionID(db *sql.DB, userID string) (string, error) {
-// 	queryStr := "SELECT u.email FROM users u WHERE u.user_id=$1"
-
-// 	rows, err := db.Query(queryStr, userID)
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	defer rows.Close()
-
-// 	var email string
-
-// 	if rows.Next() {
-// 		if err := rows.Scan(&email); err != nil {
-// 			return "", err
-// 		}
-// 	}
-
-// 	return email, nil
-// }
-
 // func getUserInfoFromAuth0(accessToken string) (*user.UserInfo, error) {
 // 	userInfoEndpoint := fmt.Sprintf("https://%s/userinfo", os.Getenv("AUTH0_DOMAIN"))
 
@@ -650,19 +630,6 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 	return count, nil
 // }
 
-// func BooksCount(database *database.DAO, w http.ResponseWriter) {
-// 	count, err := (*database).GetBookCount()
-// 	if err != nil {
-// 		http.Error(w, "Database error", http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(map[string]int{
-// 		"booksCount": count,
-// 	})
-// }
-
 // func SearchBooksPage(database *database.DAO, w http.ResponseWriter, r *http.Request) {
 // 	bookQuery := r.URL.Query().Get("textSearch")
 // 	searchTypesStr := r.URL.Query().Get("searchType")
@@ -904,32 +871,6 @@ func redirectToErrorPageWithMessageAndStatusCode(w http.ResponseWriter, errorMes
 // 			log.Printf("error: %v", err)
 // 		}
 // 		pageResultsVariables.IsAdmin = userInfo.Email == os.Getenv("LEONLIB_MAINAPP_USER")
-// 	}
-// }
-
-// func CheckLikeStatus(database *database.DAO, w http.ResponseWriter, r *http.Request) {
-// 	userID, err := getCurrentUserID(r)
-// 	if err != nil {
-// 		writeUnauthenticated(w)
-
-// 		return
-// 	}
-
-// 	vars := mux.Vars(r)
-// 	bookID := vars["book_id"]
-
-// 	exists, err := (*database).LikedBy(bookID, userID)
-// 	if err != nil {
-// 		writeErrorLikeStatus(w, err)
-// 		return
-// 	}
-
-// 	w.Header().Set("Content-Type", "application/json")
-
-// 	if exists {
-// 		json.NewEncoder(w).Encode(map[string]string{"status": "liked"})
-// 	} else {
-// 		json.NewEncoder(w).Encode(map[string]string{"status": "not-liked"})
 // 	}
 // }
 

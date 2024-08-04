@@ -57,7 +57,7 @@ func GetRegionNameFromGeoNames(w http.ResponseWriter, r *http.Request, cfg *conf
 func GetFraccionamientos(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 	userID, err := getUserIDFromSession(r)
 	if err != nil {
-		log.Printf("Error al getUserIDFromSession for %d id: %v\n", userID, err)
+		log.Printf("error: trying to get session %v\n", err)
 
 		writeUnauthorized(w)
 		return
@@ -79,9 +79,9 @@ type ErrorResponse struct {
 }
 
 func GetFraccionamientoByID(svc *service.Service, w http.ResponseWriter, r *http.Request) {
-	userID, err := getUserIDFromSession(r)
+	_, err := getUserIDFromSession(r)
 	if err != nil {
-		log.Printf("(GetFraccionamientoByID) Error al getUserIDFromSession for %d id: %v\n", userID, err)
+		log.Printf("error (GetFraccionamientoByID): trying to get session: %v", err)
 		writeUnauthorized(w)
 
 		return
@@ -97,15 +97,6 @@ func GetFraccionamientoByID(svc *service.Service, w http.ResponseWriter, r *http
 		writeErrorResponse(w, http.StatusInternalServerError, "No se pudieron obtener los fraccionamientos")
 		return
 	}
-	//userConfirmedAccount, err := svc.ConfirmAccount(token)
-	//if err != nil {
-	//	log.Printf("error: %v", err)
-	//	redirectAccountActivationProblem(w)
-	//
-	//	return
-	//}
-	//
-	//redirectAccountActivated(userConfirmedAccount, w)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
