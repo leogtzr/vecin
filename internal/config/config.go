@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -27,7 +28,8 @@ type Config struct {
 	UserTokenExpiryDays time.Duration
 	MailSenderApiKey    string
 
-	Mailing Mailing
+	Mailing            Mailing
+	RateLimiterEnabled bool
 }
 
 func getEnv(key, defaultValue string) string {
@@ -35,6 +37,18 @@ func getEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+func isConfigValueTrueOrEnabled(configValue string) bool {
+	configValueTrimmed := strings.TrimSpace(configValue)
+
+	switch configValueTrimmed {
+	case "true":
+	case "enabled":
+		return true
+	}
+
+	return false
 }
 
 func NewConfig() (*Config, error) {
@@ -57,6 +71,7 @@ func NewConfig() (*Config, error) {
 			EmailSubject:     getEnv("VECIN_CONFIRMATION_EMAIL_SUBJECT", ""),
 			MailSenderEmail:  getEnv("MAILSENDER_EMAIL_SENDER", ""),
 		},
+		RateLimiterEnabled: isConfigValueTrueOrEnabled(getEnv("RATE_LIMIT_ENABLED", "false")),
 	}
 
 	if config.MailSenderApiKey == "" {

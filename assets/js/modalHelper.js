@@ -6,7 +6,7 @@ export function showModal(message, type = 'error') {
     switch(type) {
         case 'success':
             emoji = '✅';
-            title = 'Éxito';
+            title = 'Completado';
             imageUrl = '/assets/images/success.gif';
             break;
         case 'warning':

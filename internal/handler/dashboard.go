@@ -138,6 +138,5 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }

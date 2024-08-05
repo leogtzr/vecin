@@ -67,6 +67,7 @@ $(document).ready(function() {
                 console.log(xhr);
                 console.log(status);
 
+                $('#resend-link').hide();
                 let errorMessage = "Error al reenviar el correo de activación. Por favor, inténtalo de nuevo más tarde.";
                 $('#alert-message').text(errorMessage).fadeIn();
             }

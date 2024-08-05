@@ -137,6 +137,7 @@ func ResendActivationEmail(dao *database.DAO, svc *service.Service, w http.Respo
 
 	token, err := svc.CreateNewConfirmationAccountToken(user.ID)
 	if err != nil {
+		log.Printf("error: %v", err)
 		writeMessageWithStatusCode(w, "Error al enviar el correo de activación (token)", http.StatusInternalServerError)
 		return
 	}

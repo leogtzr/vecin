@@ -214,8 +214,10 @@ func NewRouter(dao *database.DAO, limiter *rate.Limiter, cfg *config.Config) *mu
 
 	})
 
-	rateLimitMiddleware := middleware.RateLimitMiddlewareAdapter(limiter, nextHandler)
-	router.Use(rateLimitMiddleware)
+	if cfg.RateLimiterEnabled {
+		rateLimitMiddleware := middleware.RateLimitMiddlewareAdapter(limiter, nextHandler)
+		router.Use(rateLimitMiddleware)
+	}
 
 	for _, route := range *routes {
 		router.
