@@ -1619,7 +1619,7 @@ func ProfilePage(svc *service.Service, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusUnauthorized)
+	w.WriteHeader(http.StatusOK)
 
 	pageVariables := PageVariables{
 		Year:     time.Now().Format("2006"),
